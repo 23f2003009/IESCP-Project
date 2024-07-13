@@ -6,6 +6,8 @@
     <title>Influencer Find</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
 <body>
     <div id="container">
@@ -20,11 +22,71 @@
                             <a class="nav-link active" href="/templates/influencer_find.html">Find</a>
                             <a class="nav-link" href="#">Statistics</a>
                             <a class="nav-link" href="#">Logout</a>
+                            <input class="form-control" type="search" placeholder="Search by Campaign/Ad Title" aria-label="Search">
+                            <button type="submit" class="btn btn-success btn-sm">Search</button>
                         </div>
                     </div>
                 </div>
             </nav>
         </div>
+
+        <div class="container row">
+            <h5 class="text-center my-4">All Ads</h5>
+            <div class="col-sm-3">
+                <div class="card">
+                    <div class="card-body">
+                        <p>
+                            Ad Title: <br>
+                            Payment Amount: <br>
+                            Niche: <br><br>
+                            <!-- VIEW AD REQUEST MODAL TRIGGER BUTTON -->
+                            <a href="#" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewAdRequestModal">View</a>
+                            <button type="submit" class="btn btn-outline-success btn-sm">Request</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container row">
+            <h5 class="text-center my-4">All Public Campaigns</h5>
+            <div class="col-sm-3">
+                <div class="card">
+                    <div class="card-body">
+                        <p>
+                            Campaign Title: <br>
+                            Campaign desc: <br><br>
+                            <a href="/templates/campaign_all_ads.html" class="btn btn-outline-primary btn-sm">View Campaign All Ads</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW AD REQUEST MODAL -->
+        <!-- In every field, add the original values from database -->
+        <div class="modal fade" id="viewAdRequestModal" tabindex="-1" aria-labelledby="viewAdRequestModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewAdRequestModalLabel">Ad Request</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            Ad Title: <br>
+                            campaign title: <br>
+                            sponsor company/individual: <br>
+                            Niche: <br>
+                            Requirement: <br>
+                            start - end date: <br>
+                            Payment Amount:
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </body>
 </html>

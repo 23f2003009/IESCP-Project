@@ -23,6 +23,8 @@ class Influencer(db.Model):
     username = db.Column(db.String, unique=True, nullable=False)
     password = db.Column(db.String, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
+    earning = db.Column(db.Integer, default=0)
+    profile_pic = db.Column(db.String)
 
 class Admin(db.Model):
     __tablename__ = 'admin'
@@ -52,7 +54,7 @@ class Campaign(db.Model):
     __tablename__ = 'campaign'
     id = db.Column(db.Integer, primary_key=True)
     sponsor_id = db.Column(db.Integer, db.ForeignKey('sponsor.id'), nullable=False)
-    visibility = db.Column(db.Enum('Private', 'Public'), nullable=False)
+    visibility = db.Column(db.Enum('Private', 'Public'), default='Public', nullable=False)
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String)
     goal = db.Column(db.String)
@@ -63,7 +65,7 @@ class Campaign(db.Model):
 class Ad_Request(db.Model):
     __tablename__ = 'ad_request'
     id = db.Column(db.Integer, primary_key=True)
-    influencer_id = db.Column(db.Integer, db.ForeignKey('influencer.id'), nullable=False)
+    influencer_id = db.Column(db.Integer, db.ForeignKey('influencer.id'))
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'), nullable=False)
     title = db.Column(db.String, nullable=False)
     status = db.Column(db.Enum('Pending', 'Accepted', 'Rejected'), default='Pending')
