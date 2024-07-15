@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Find</title>
+    <!-- BOOTSTRAP CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+    <div id="container">
+        <!-- NAVIGATION BAR -->
+        <div id="panel">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container-fluid">
+                    <label class="navbar-brand">Admin Dashboard</label>
+                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                        <div class="navbar-nav">
+                            <a class="nav-link" aria-current="page" href="/templates/admin_dashboard.html">Information</a>
+                            <a class="nav-link active" href="/templates/admin_find.html">Find</a>
+                            <a class="nav-link" href="#">Statistics</a>
+                            <a class="nav-link" href="#">Logout</a>
+                            <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+                            <button type="submit" class="btn btn-success btn-sm">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <!-- ALL CAMPAIGNS -->
+        <div class="container row">
+            <h5 class="text-center"><br>Campaigns</h5>
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">Campaign 01</h6>
+                        <p class="card-text">
+                            campaign desc: <br>
+                        </p>
+                        <a href="/templates/admin_campaign_details.html" class="btn btn-outline-primary btn-sm">View</a>
+                        <button type="button" class="btn btn-outline-danger btn-sm">Flag</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALL INFLUENCERS -->
+        <div class="container row">
+            <h5 class="text-center"><br>Influencers</h5>
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">Influencer 01</h6>
+                        <p class="card-text">
+                            Name: <br>
+                            Username: <br>
+                        </p>
+                        <a href="/templates/influencer_dashboard.html" class="btn btn-outline-primary btn-sm">View</a>
+                        <button type="button" class="btn btn-outline-danger btn-sm">Flag</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALL SPONSORS -->
+        <div class="container row">
+            <h5 class="text-center"><br>Sponsors</h5>
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">Sponsor 01</h6>
+                        <p class="card-text">
+                            Name: <br>
+                            Username: <br>
+                        </p>
+                        <a href="/templates/sponsor_dashboard.html" class="btn btn-outline-primary btn-sm">View</a>
+                        <button type="button" class="btn btn-outline-danger btn-sm">Flag</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
