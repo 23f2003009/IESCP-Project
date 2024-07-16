@@ -13,7 +13,7 @@ class Sponsor(db.Model):
     budget = db.Column(db.Float, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
     type = db.Column(db.Enum('Company', 'Individual'), nullable=False)
-    flagged = db.Column(db.Boolean, deafult=False)
+    flagged = db.Column(db.Boolean, default=False)
 
 class Influencer(db.Model):
     __tablename__ = 'influencer'
@@ -26,7 +26,7 @@ class Influencer(db.Model):
     email = db.Column(db.String, unique=True, nullable=False)
     earning = db.Column(db.Integer, default=0)
     profile_pic = db.Column(db.String)
-    flagged = db.Column(db.Boolean, deafult=False)
+    flagged = db.Column(db.Boolean, default=False)
 
 class Admin(db.Model):
     __tablename__ = 'admin'
@@ -63,7 +63,7 @@ class Campaign(db.Model):
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
     budget = db.Column(db.Float, nullable=False)
-    flagged = db.Column(db.Boolean, deafult=False)
+    flagged = db.Column(db.Boolean, default=False)
 
 class Ad_Request(db.Model):
     __tablename__ = 'ad_request'

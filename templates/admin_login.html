@@ -15,19 +15,20 @@
         <div class="col-md-4" id="panel">
             <h3 style="text-align: center;">Administrator Login</h3>
 
-            <form>
+            <form method="POST" action="/admin_login">
 
                 <div class="mb-3">
                     <label for="admin_username" class="form-label">Administrator ID</label>
-                    <input type="text" class="form-control" id="admin_username" placeholder="Enter username">
+                    <input type="text" class="form-control" name="admin_username" id="admin_username" placeholder="Enter username">
                 </div>
 
                 <div class="mb-3">
                     <label for="admin_password" class="form-label">Administrator Password</label>
-                    <input type="password" class="form-control" id="admin_password" placeholder="Enter password">
+                    <input type="password" class="form-control" name="admin_password" id="admin_password" placeholder="Enter password">
                 </div>
                 
                 <button type="submit" class="btn btn-success btn-sm">Log In</button> 
+                <div class="text-danger"><br>{{error}}<br></div>
                 Not an administrator? <a href="/user_login">Click here</a>
             </form>
         </div>

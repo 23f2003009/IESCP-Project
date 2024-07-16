@@ -15,121 +15,123 @@
         <div class="col-md-12" id="panel">
             <h3 style="text-align: center;">Influencer Registration</h3>
 
-            <form class="row g-3">
+            <form class="row g-3" method="POST" action="/influencer_signup">
 
                 <div class="col-md-5">
                     <label for="firstName" class="form-label">First Name</label>
-                    <input type="text" class="form-control" placeholder="First name" id="firstName" aria-label="First name">
+                    <input type="text" class="form-control" placeholder="First name" name="firstName" id="firstName" aria-label="First name">
                 </div>
 
                 <div class="col-md-5">
                     <label for="lastName" class="form-label">Last Name</label>
-                    <input type="text" class="form-control" placeholder="Last name" id="lastName" aria-label="Last name">
+                    <input type="text" class="form-control" placeholder="Last name" name="lastName" id="lastName" aria-label="Last name">
                 </div>
 
                 <div class="col-md-2">
                     <label for="age" class="form-label">Age</label>
-                    <input type="number" class="form-control" placeholder="Enter your age" id="age" aria-label="age">
+                    <input type="number" class="form-control" placeholder="Enter your age" name="age" id="age" aria-label="age">
                 </div>
 
                 <div class="col-md-4">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" placeholder="johndoe@domain.com">
+                    <input type="email" class="form-control" id="email" name="email" placeholder="johndoe@domain.com">
                 </div>
 
                 <div class="col-md-4">
                     <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" placeholder="Create a username" aria-describedby="usernameHelp">
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Create a username" aria-describedby="usernameHelp">
                     <div id="usernameHelp" class="form-text">Your username can only have alphabets.</div>
                 </div>
 
                 <div class="col-md-4">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" placeholder="Create a password" aria-describedby="passwordHelp">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Create a password" aria-describedby="passwordHelp">
                     <div id="passwordHelp" class="form-text">Create a strong password.</div>
                 </div>
 
+                <!-- SOCIAL ACCOUNTS (REACH) -->
                 <div>
                     Social Media Platforms' Presence
                 </div>
                 <div class="col-md-3">
-                    <input class="form-check-input" type="checkbox" id="instagram">
+                    <input class="form-check-input" type="checkbox" id="instagram" name="instagram">
                     <label class="form-check-label" for="instagram">Instagram</label>
-                    <input type="number" class="form-control" id="instagramFollowers" placeholder="Followers count">
-                    <input type="text" class="form-control" id="instagramProfile" placeholder="Profile link">
+                    <input type="number" class="form-control" id="instagramFollowers" name="instagramFollowers" placeholder="Followers count">
+                    <input type="text" class="form-control" id="instagramProfile" name="instagramProfile" placeholder="Profile link">
                 </div>
 
                 <div class="col-md-3">
-                    <input class="form-check-input" type="checkbox" id="twitter">
+                    <input class="form-check-input" type="checkbox" id="twitter" name="twitter">
                     <label class="form-check-label" for="twitter">Twitter</label>
-                    <input type="number" class="form-control" id="twitterFollowers" placeholder="Followers count">
-                    <input type="text" class="form-control" id="twitterProfile" placeholder="Profile link">
+                    <input type="number" class="form-control" id="twitterFollowers" name="twitterFollowers" placeholder="Followers count">
+                    <input type="text" class="form-control" id="twitterProfile" name="twitterProfile" placeholder="Profile link">
                 </div>
 
                 <div class="col-md-3">
-                    <input class="form-check-input" type="checkbox" id="youtube">
+                    <input class="form-check-input" type="checkbox" id="youtube" name="youtube">
                     <label class="form-check-label" for="youtube">YouTube</label>
-                    <input type="number" class="form-control" id="youtubeFollowers" placeholder="Followers count">
-                    <input type="text" class="form-control" id="youtubeProfile" placeholder="Channel link">
+                    <input type="number" class="form-control" id="youtubeFollowers" name="youtubeFollowers" placeholder="Followers count">
+                    <input type="text" class="form-control" id="youtubeProfile" name="youtubeProfile" placeholder="Channel link">
                 </div>
 
                 <div class="col-md-3">
-                    <input class="form-check-input" type="checkbox" id="linkedin">
+                    <input class="form-check-input" type="checkbox" id="linkedin" name="linkedin">
                     <label class="form-check-label" for="linkedin">LinkedIn</label>
-                    <input type="number" class="form-control" id="linkedinFollowers" placeholder="Followers count">
-                    <input type="text" class="form-control" id="linkedinProfile" placeholder="Profile link">
+                    <input type="number" class="form-control" id="linkedinFollowers" name="linkedinFollowers" placeholder="Followers count">
+                    <input type="text" class="form-control" id="linkedinProfile" name="linkedinProfile" placeholder="Profile link">
                 </div>
 
+                <!-- NICHES -->
                 <div class="col-md-10">
                     <label for="niches" class="form-label">Niche(s)</label>
                     <div id="niches" class="checkbox-group">
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="checkboxFitness" value="fitness">
+                            <input class="form-check-input" type="checkbox" name="niches" id="checkboxFitness" value="fitness">
                             <label class="form-check-label" for="checkboxFitness">Fitness</label>
                         </div>
 
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="checkboxEducation" value="education">
+                            <input class="form-check-input" type="checkbox" name="niches" id="checkboxEducation" value="education">
                             <label class="form-check-label" for="checkboxEducation">Education</label>
                         </div>
 
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="checkboxCosmetics" value="cosmetics">
+                            <input class="form-check-input" type="checkbox" name="niches" id="checkboxCosmetics" value="cosmetics">
                             <label class="form-check-label" for="checkboxCosmetics">Cosmetics</label>
                         </div>
 
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="checkboxTechnology" value="technology">
+                            <input class="form-check-input" type="checkbox" name="niches" id="checkboxTechnology" value="technology">
                             <label class="form-check-label" for="checkboxTechnology">Technology</label>
                         </div>
 
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="checkboxFinance" value="finance">
+                            <input class="form-check-input" type="checkbox" name="niches" id="checkboxFinance" value="finance">
                             <label class="form-check-label" for="checkboxFinance">Finance</label>
                         </div>
 
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="checkboxTravel" value="travel">
+                            <input class="form-check-input" type="checkbox" name="niches" id="checkboxTravel" value="travel">
                             <label class="form-check-label" for="checkboxTravel">Travel</label>
                         </div>
 
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="checkboxFood" value="food">
+                            <input class="form-check-input" type="checkbox" name="niches" id="checkboxFood" value="food">
                             <label class="form-check-label" for="checkboxFood">Food</label>
                         </div>
 
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="checkboxFashion" value="fashion">
+                            <input class="form-check-input" type="checkbox" name="niches" id="checkboxFashion" value="fashion">
                             <label class="form-check-label" for="checkboxFashion">Fashion</label>
                         </div>
 
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="checkboxEntertainment" value="entertainment">
+                            <input class="form-check-input" type="checkbox" name="niches" id="checkboxEntertainment" value="entertainment">
                             <label class="form-check-label" for="checkboxEntertainment">Entertainment</label>
                         </div>
 
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="checkboxPets" value="pets">
+                            <input class="form-check-input" type="checkbox" name="niches" id="checkboxPets" value="pets">
                             <label class="form-check-label" for="checkboxPets">Pets</label>
                         </div>
                     </div>
@@ -139,6 +141,8 @@
                     <button type="submit" class="btn btn-success"> Register </button>
                 </div>
                 
+                <div class="text-danger"> <br> {{error}} <br> </div>
+
                 <div class="col-12">
                     Already registered? <a href="/user_login" class="btn btn-outline-secondary btn-sm">Login</a>
                 </div>

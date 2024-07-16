@@ -15,43 +15,43 @@
         <div class="col-md-8" id="panel">
             <h3 style="text-align: center;">Sponsor Registration</h3>
 
-            <form class="row g-3">
+            <form class="row g-3" method="POST" action="/sponsor_signup">
 
                 <div class="col-md-6">
                     <label for="firstName" class="form-label">First Name</label>
-                    <input type="text" class="form-control" placeholder="First name" id="firstName" aria-label="First name">
+                    <input type="text" class="form-control" name="firstName" placeholder="First name" id="firstName" aria-label="First name">
                 </div>
 
                 <div class="col-md-6">
                     <label for="lastName" class="form-label">Last Name</label>
-                    <input type="text" class="form-control" placeholder="Last name" id="lastName" aria-label="Last name">
+                    <input type="text" class="form-control" name="lastName" placeholder="Last name" id="lastName" aria-label="Last name">
                 </div>
 
                 <div class="col-md-6">
                     <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" placeholder="Create a username" aria-describedby="usernameHelp">
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Create a username" aria-describedby="usernameHelp">
                     <div id="usernameHelp" class="form-text">Your username can only have alphabets.</div>
                 </div>
 
                 <div class="col-md-6">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" placeholder="Create a password" aria-describedby="passwordHelp">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Create a password" aria-describedby="passwordHelp">
                     <div id="passwordHelp" class="form-text">Create a strong password.</div>
                 </div>
 
                 <div class="col-md-5">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" placeholder="johndoe@domain.com">
+                    <input type="email" class="form-control" id="email" name="email" placeholder="johndoe@domain.com">
                 </div>
 
                 <div class="col-md-4">
                     <label for="industry" class="form-label">Industry</label>
-                    <input type="text" class="form-control" id="industry" placeholder="eg: Fashion">
+                    <input type="text" class="form-control" id="industry" name="industry" placeholder="eg: Fashion">
                 </div>
 
                 <div class="col-md-3">
                     <label for="budget" class="form-label">Budget</label>
-                    <input type="number" class="form-control" placeholder="Enter budget" id="budget" aria-label="budget">
+                    <input type="number" class="form-control" placeholder="Enter budget" name="budget" id="budget" aria-label="budget">
                 </div>
 
                 <div class="col-md-12">
@@ -66,6 +66,8 @@
                 <div class="col-12">
                     <button type="submit" class="btn btn-success"> Register </button>
                 </div>
+
+                <div class="text-danger"> <br> {{error}} <br> </div>
         
                 <div class="col-12">
                     Already registered? <a href="/user_login" class="btn btn-outline-secondary btn-sm">Login</a>
