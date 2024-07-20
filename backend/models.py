@@ -14,6 +14,7 @@ class Sponsor(db.Model):
     email = db.Column(db.String, unique=True, nullable=False)
     type = db.Column(db.Enum('Company', 'Individual'), nullable=False)
     flagged = db.Column(db.Boolean, default=False)
+    campaign = db.relationship('Campaign', backref='sponsor')
 
 class Influencer(db.Model):
     __tablename__ = 'influencer'
@@ -27,6 +28,9 @@ class Influencer(db.Model):
     earning = db.Column(db.Integer, default=0)
     profile_pic = db.Column(db.String)
     flagged = db.Column(db.Boolean, default=False)
+    reach = db.relationship('Reach', backref='influencer')
+    ad_request = db.relationship('Ad_Request', backref='influencer')
+    influencer_niche = db.relationship('Influencer_Niche', backref='influencer')
 
 class Admin(db.Model):
     __tablename__ = 'admin'
@@ -46,6 +50,8 @@ class Niche(db.Model):
     __tablename__ = 'niche'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
+    influencer_niche = db.relationship('Influencer_Niche', backref='niche')
+    ad_request = db.relationship('Ad_Request', backref='niche')
 
 class Influencer_Niche(db.Model):
     __tablename__ = 'influencer_niche'
@@ -64,6 +70,7 @@ class Campaign(db.Model):
     end_date = db.Column(db.Date, nullable=False)
     budget = db.Column(db.Float, nullable=False)
     flagged = db.Column(db.Boolean, default=False)
+    ad_request = db.relationship('Ad_Request', backref='campaign')
 
 class Ad_Request(db.Model):
     __tablename__ = 'ad_request'
@@ -75,4 +82,3 @@ class Ad_Request(db.Model):
     payment_amount = db.Column(db.Float, nullable=False)
     requirement = db.Column(db.String, nullable=False)
     niche_id = db.Column(db.Integer, db.ForeignKey('niche.id'), nullable=False)
-    niche = db.relationship('Niche', backref='ads')
