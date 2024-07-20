@@ -12,7 +12,7 @@ class Sponsor(db.Model):
     industry = db.Column(db.String, nullable=False)
     budget = db.Column(db.Float, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
-    type = db.Column(db.Enum('Company', 'Individual'), nullable=False)
+    type = db.Column(db.Enum('company', 'individual'), nullable=False)
     flagged = db.Column(db.Boolean, default=False)
     campaign = db.relationship('Campaign', backref='sponsor')
 
@@ -42,7 +42,7 @@ class Reach(db.Model):
     __tablename__ = 'reach'
     id = db.Column(db.Integer, primary_key=True)
     influencer_id = db.Column(db.Integer, db.ForeignKey('influencer.id'), nullable=False)
-    platform = db.Column(db.Enum('Instagram', 'Twitter', 'Youtube', 'Linkedin'), nullable=False)
+    platform = db.Column(db.Enum('instagram', 'twitter', 'youtube', 'linkedin'), nullable=False)
     followers = db.Column(db.Integer, nullable=False)
     profile_link = db.Column(db.String, nullable=False)
 
@@ -62,7 +62,7 @@ class Campaign(db.Model):
     __tablename__ = 'campaign'
     id = db.Column(db.Integer, primary_key=True)
     sponsor_id = db.Column(db.Integer, db.ForeignKey('sponsor.id'), nullable=False)
-    visibility = db.Column(db.Enum('Private', 'Public'), default='Public', nullable=False)
+    visibility = db.Column(db.Enum('private', 'public'), default='public', nullable=False)
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String)
     goal = db.Column(db.String)
@@ -78,7 +78,7 @@ class Ad_Request(db.Model):
     influencer_id = db.Column(db.Integer, db.ForeignKey('influencer.id'))
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'), nullable=False)
     title = db.Column(db.String, nullable=False)
-    status = db.Column(db.Enum('Pending', 'Accepted', 'Rejected'), default='Pending')
+    status = db.Column(db.Enum('pending', 'accepted', 'rejected'), default='pending')
     payment_amount = db.Column(db.Float, nullable=False)
     requirement = db.Column(db.String, nullable=False)
     niche_id = db.Column(db.Integer, db.ForeignKey('niche.id'), nullable=False)
