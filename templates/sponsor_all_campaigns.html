@@ -18,9 +18,9 @@
                     <label class="navbar-brand">Sponsor 01 Dashboard</label>
                     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                         <div class="navbar-nav">
-                            <a class="nav-link" aria-current="page" href="/templates/sponsor_dashboard.html">Profile</a>
-                            <a class="nav-link active" href="/templates/sponsor_all_campaigns.html">Campaign</a>
-                            <a class="nav-link" href="/templates/sponsor_find.html">Find</a>
+                            <a class="nav-link" aria-current="page" href="/sponsor_dashboard/{{ sponsor_id }}">Profile</a>
+                            <a class="nav-link active" href="/sponsor_all_campaigns/{{ sponsor_id }}">Campaign</a>
+                            <a class="nav-link" href="/sponsor_find/{{ sponsor_id }}">Find</a>
                             <a class="nav-link" href="#">Statistics</a>
                             <a class="nav-link" href="#">Logout</a>
                             <input class="form-control" type="search" placeholder="Search campaign title" aria-label="Search">
@@ -34,41 +34,54 @@
         <!-- ACTIVE CAMPAIGN CARDS -->
         <div class="container row">
             <h5 class="text-center my-4">Active Campaigns</h5>
-            <div class="col-sm-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title">Campaign 01</h6>
-                        <p class="card-text">
-                            Title: <br>
-                            Desc: <br>
-                            Goal: <br>
-                            Start date: <br>
-                            End Date:
-                        </p>
-                        <!-- EDIT MODAL TRIGGER BUTTON -->
-                        <button type="button" class=" btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#editCampaignModal">Edit</button>
-                        <a href="/templates/sponsor_campaign_details.html" class="btn btn-outline-primary btn-sm">View</a>
-                        <button type="button" class=" btn btn-outline-danger btn-sm">Delete</button>
+
+            {% if active_campaigns %}
+                {% for key, value in active_campaigns.items() %}
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ value.title }}</h6>
+                                <p class="card-text">
+                                    Description: {{ value.description }}<br>
+                                    Goal: {{ value.goal }} <br>
+                                    Timeline: {{ value.start_date }} - {{ value.end_date }}
+                                </p>
+                                <!-- EDIT MODAL TRIGGER BUTTON -->
+                                <button type="button" class=" btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#editCampaignModal">Edit</button>
+                                <a href="/campaign_details/{{ sponsor_id }}/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
+                                <button type="button" class=" btn btn-outline-danger btn-sm">Delete</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+                {% endfor %}
+            {% else %}
+                <h5 class="text-secondary">You have no active campaigns</h5>
+            {% endif %}
         </div>
+
 
         <!-- COMPLETED CAMPAIGN CARDS -->
         <div class="container row">
             <h5 class="text-center my-4">Completed Campaigns</h5>
-            <div class="col-sm-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title">Campaign 01</h6>
-                        <p class="card-text">
-                            Title: <br>
-                            Desc: <br>
-                            Goal: <br>
-                        </p>
+
+            {% if completed_campaigns %}
+                {% for key, value in completed_campaigns.items() %}
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ value.title }}</h6>
+                                <p class="card-text">
+                                    Description: {{ value.description }}<br>
+                                    Goal: {{ value.goal }} <br>
+                                    Budget: {{ value.budget }}
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+                {% endfor %}
+            {% else %}
+                <h5 class="text-secondary">No campaigns completed yet</h5>
+            {% endif %}
 
             <!-- ADD CAMPAIGN MODAL TRIGGER BUTTON -->
             <div class="text-center mt-4">

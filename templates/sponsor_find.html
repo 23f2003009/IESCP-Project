@@ -13,12 +13,12 @@
         <div id="panel">
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
                 <div class="container-fluid">
-                    <label class="navbar-brand">Sponsor 01 Dashboard</label>
+                    <label class="navbar-brand">{{ first_name }}{{ last_name }} Dashboard</label>
                     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                         <div class="navbar-nav">
-                            <a class="nav-link" href="/templates/sponsor_dashboard.html">Profile</a>
+                            <a class="nav-link" href="/sponsor_dashboard/{{ id }}">Profile</a>
                             <a class="nav-link" href="/templates/sponsor_all_campaigns.html">Campaign</a>
-                            <a class="nav-link active" href="/templates/sponsor_find.html">Find</a>
+                            <a class="nav-link active" href="/sponsor_find/{{ id }}">Find</a>
                             <a class="nav-link" href="#">Statistics</a>
                             <a class="nav-link" href="#">Logout</a>
                             <input class="form-control" type="search" placeholder="Search Influencers" aria-label="Search">
@@ -31,20 +31,35 @@
 
         <div class="container row">
             <h5 class="text-center my-4">Search Influencers</h5>
-            <div class="col-sm-3">
-                <div class="card">
-                    <div class="card-body">
-                        <p>
-                            Influencer Name: <br>
-                            associated accounts: <br><br>
-                            <a href="#" class="btn btn-outline-primary btn-sm">View</a>
-                            <button type="submit" class="btn btn-outline-success btn-sm">Request</button>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
+            {% if all_influencers %}
+                {% for key, value in all_influencers.items() %}
+                    <div class="col-sm-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">Influencer Name: {{ value.fname }} {{ value.lname }}</h6>
+                                <p class="card-text">
+                                    Associated accounts: <br>
+                                    {% for account, info in value.social_accounts.items() %}
+                                        {{ account }} : <br>
+                                        - Followers count: {{ info.followers }} <br>
+                                        - Profile Link: {{ info.url }} <br>
+                                    {% endfor %}
 
+                                    Niches of influencer: <br>
+                                    {% for niche in value.niches.items() %}
+                                        {{ niche }} 
+                                    {% endfor %} <br>
+                                    <!-- <a href="#" class="btn btn-outline-primary btn-sm">View</a> -->
+                                    <button type="submit" class="btn btn-outline-success btn-sm">Request</button>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h5 class="text-secondary">No influencers regiserted yet!</h5>
+            {% endif %}
+        </div>
 
     </div>
 </body>

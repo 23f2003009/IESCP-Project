@@ -28,20 +28,19 @@
             </nav>
         </div>
 
-        <!-- ALL CAMPAIGNS -->
+        <!-- ACTIVE CAMPAIGNS -->
         <div class="container row">
-            <h5 class="text-center"><br>Campaigns</h5>
-
-            {% if all_campaigns %}
-                {% for key, value in all_campaigns.items() %}
+            <h5 class="text-center"><br>Active Campaigns</h5>
+            {% if active_campaigns %}
+                {% for key, value in active_campaigns.items() %}
                     <div class="col-sm-4">
                         <div class="card">
                             <div class="card-body">
-                                <h6 class="card-title">{{ value[0] }}</h6>   <!-- Campaign Title -->
+                                <h6 class="card-title">{{ value.title }}</h6>   <!-- Campaign Title -->
                                 <p class="card-text">
-                                    Description: {{ value[1] }} <br>
+                                    Description: {{ value.description }} <br>
                                 </p>
-                                <a href="/templates/admin_campaign_details.html" class="btn btn-outline-primary btn-sm">View</a>
+                                <a href="/campaign_details/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
                                 <button type="button" class="btn btn-outline-danger btn-sm">Flag</button>
                             </div>
                         </div>
@@ -52,10 +51,32 @@
             {% endif %}
         </div>
 
+        <!-- COMPLETED CAMPAIGNS -->
+        <div class="container row">
+            <h5 class="text-center"><br>Completed Campaigns</h5>
+            {% if completed_campaigns %}
+                {% for key, value in completed_campaigns.items() %}
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ value.title }}</h6>   <!-- Campaign Title -->
+                                <p class="card-text">
+                                    Description: {{ value.description }} <br>
+                                </p>
+                                <a href="admin_campaign_details.html" class="btn btn-outline-primary btn-sm">View</a>
+                                <button type="button" class="btn btn-outline-danger btn-sm">Flag</button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h4 class="text-secondary">No Campaigns completed yet!</h4>
+            {% endif %}
+        </div>
+
         <!-- ALL INFLUENCERS -->
         <div class="container row">
             <h5 class="text-center"><br>Influencers</h5>
-
             {% if all_influencers %}
                 {% for key, value in all_influencers.items() %}
                     <div class="col-sm-4">
@@ -63,10 +84,10 @@
                             <div class="card-body">
                                 <h6 class="card-title">ID: {{ key }} </h6>
                                 <p class="card-text">
-                                    Name: {{ value[0] }} {{ value[1] }} <br>
-                                    Username: {{ value[2] }}<br>
+                                    Name: {{ value.fname }} {{ value.lname }} <br>
+                                    Username: {{ value.username }}<br>
                                 </p>
-                                <a href="/templates/influencer_dashboard.html" class="btn btn-outline-primary btn-sm">View</a>
+                                <a href="/influencer_dashboard/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
                                 <button type="button" class="btn btn-outline-danger btn-sm">Flag</button>
                             </div>
                         </div>
@@ -80,7 +101,6 @@
         <!-- ALL SPONSORS -->
         <div class="container row">
             <h5 class="text-center"><br>Sponsors</h5>
-
             {% if all_sponsors %}
                 {% for key, value in all_sponsors.items() %}
                     <div class="col-sm-4">
@@ -88,10 +108,10 @@
                             <div class="card-body">
                                 <h6 class="card-title">ID: {{ key }}</h6>
                                 <p class="card-text">
-                                    Name: {{ value[0] }} {{ value[1] }} <br>
-                                    Username: {{ value[2] }} <br>
+                                    Name: {{ value.fname }} {{ value.lname }} <br>
+                                    Username: {{ value.username }} <br>
                                 </p>
-                                <a href="/templates/sponsor_dashboard.html" class="btn btn-outline-primary btn-sm">View</a>
+                                <a href="/sponsor_dashboard/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
                                 <button type="button" class="btn btn-outline-danger btn-sm">Flag</button>
                             </div>
                         </div>

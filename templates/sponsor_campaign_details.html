@@ -18,9 +18,9 @@
                     <label class="navbar-brand">Sponsor 01 Dashboard</label>
                     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                         <div class="navbar-nav">
-                            <a class="nav-link" aria-current="page" href="sponsor_dashboard.html">Profile</a>
-                            <a class="nav-link active" href="/templates/sponsor_all_campaigns.html">Campaign</a>
-                            <a class="nav-link" href="/templates/sponsor_find.html">Find</a>
+                            <a class="nav-link" aria-current="page" href="/sponsor_dashboard/{{ sponsor_id }}">Profile</a>
+                            <a class="nav-link active" href="/sponsor_all_campaigns/{{ sponsor_id }}">Campaign</a>
+                            <a class="nav-link" href="/sponsor_find/{{ sponsor_id }}">Find</a>
                             <a class="nav-link" href="#">Statistics</a>
                             <a class="nav-link" href="#">Logout</a>
                             <input class="form-control" type="search" placeholder="Search ad title" aria-label="Search">
@@ -31,45 +31,54 @@
             </nav>
         </div>
 
+        
         <!-- CAMPAIGN DESCRIPTION -->
-        <div class="container row mt-4">
-            <h4>Campaign title</h4>
-            <p>
-                description: <br>
-                start date: <br>
-                end date: <br>
-                Visibility: <br>
-                budget: <br>
-            </p>
-        </div>
-
-        <!-- AD REQUEST CARDS -->
-        <div class="container row">
-            <h5 class="text-center mb-4">Ad Requests</h5>
-            <div class="col-sm-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title">Ad Request 01</h6>
-                        <p class="card-text">
-                            Title: <br>
-                            Requirements: <br>
-                            Payment Amount: <br>
-                            Influencer Assigned: <br>
-                            Status: <br>
-                            Niche:
-                        </p>
-                        <!-- EDIT MODAL TRIGGER BUTTON -->
-                        <button type="button" class=" btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#editAdRequestModal">Edit</button>
-                        <button type="button" class=" btn btn-outline-danger btn-sm">Delete</button>
-                    </div>
+        {% if campaign_info %}
+            {% for key, value in campaign_info.items() %}
+                <div class="container row mt-4">
+                    <h4>{{ value.title }}</h4>
+                    <p>
+                        Description: {{ value.description }} <br>
+                        Goal: {{ value.goal }} <br>
+                        Timeline: {{ value.start_date }} - {{ value.end_date }} <br>
+                        Visibility: {{ value.visibility }} <br>
+                        Budget: {{ value.budget }} <br>
+                    </p>
                 </div>
-            </div>
 
-            <!-- ADD AD REQUEST MODAL TRIGGER BUTTON -->
-            <div class="text-center mt-4">
-                <button type="button" class=" btn btn-success" data-bs-toggle="modal" data-bs-target="#adRequestModal">Create New Ad Request</button>
-            </div>
+                <!-- AD REQUEST CARDS -->
+                <div class="container row">
+                    <h5 class="text-center mb-4">Ad Requests</h5>
+                    {% for id, details in value.ads.items() %}
+                        <div class="col-sm-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ details.title }}</h6>
+                                    <p class="card-text">
+                                        Requirements: {{ details.requirements }} <br>
+                                        Payment Amount: {{ details.payment_amount }} <br>
+                                        Influencer Assigned: {{ details.influencer_fname }} {{ details.influencer_lname }} <br>
+                                        Status: {{ details.status }} <br>
+                                        Niche: {{ details.niche }}
+                                    </p>
+                                    <!-- EDIT MODAL TRIGGER BUTTON -->
+                                    <button type="button" class=" btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#editAdRequestModal">Edit</button>
+                                    <button type="button" class=" btn btn-outline-danger btn-sm">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
 
+        {% else  %}
+            <h4 class="text-danger">The campaign has been flagged for inapropriate content!</h4>
+        {% endif %}
+
+
+        <!-- ADD AD REQUEST MODAL TRIGGER BUTTON -->
+        <div class="text-center mt-4">
+            <button type="button" class=" btn btn-success" data-bs-toggle="modal" data-bs-target="#adRequestModal">Create New Ad Request</button>
         </div>
 
 
@@ -105,8 +114,8 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Discard</button>
-                        <button type="button" class="btn btn-success">Add</button>
-                        <a href="/templates/sponsor_find.html" class="btn btn-warning">Find Influencer</a>
+                        <button type="submit" class="btn btn-success">Add</button>
+                        <a href="/sponsor_find/{{ sponsor_id }}" class="btn btn-warning">Find Influencer</a>
                     </div>
                 </div>
             </div>
@@ -145,7 +154,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Discard</button>
-                        <button type="button" class="btn btn-success">Save</button>
+                        <button type="submit" class="btn btn-success">Save</button>
                     </div>
                 </div>
             </div>

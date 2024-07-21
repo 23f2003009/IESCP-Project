@@ -35,9 +35,10 @@
                     <div class="col-sm-4">
                         <div class="card">
                             <div class="card-body">
-                                <h6 class="card-title">{{ value[0] }}</h6>   <!-- Campaign Title -->
+                                <h6 class="card-title">{{ value.title }}</h6>   <!-- Campaign Title -->
                                 <p class="card-text">
-                                    Description: {{ value[1] }}<br>
+                                    Description: {{ value.description }}<br>
+                                    Timeline: {{ value.start_date }} - {{ value.end_date }}
                                     campaign progress:   
                                     <div class="progress">
                                         <!-- replace 25 by {{ progress }}% -->
@@ -45,7 +46,7 @@
                                         <div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
                                     </div>
                                 </p>
-                                <a href="/templates/admin_campaign_details.html" class="btn btn-outline-primary btn-sm">View</a>
+                                <a href="/campaign_details/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
                                 <button type="button" class="btn btn-outline-danger btn-sm">Flag</button>
                             </div>
                         </div>
@@ -66,9 +67,9 @@
                     <div class="col-sm-4">
                         <div class="card">
                             <div class="card-body">
-                                <h6 class="card-title"> {{ value[0] }} </h6>     <!-- Campaign Title -->
+                                <h6 class="card-title"> {{ value.title }} </h6>     <!-- Campaign Title -->
                                 <p class="card-text">
-                                    Description: {{ value[1] }} <br>
+                                    Description: {{ value.description }} <br>
                                 </p>
                                 <a href="/templates/admin_campaign_details.html" class="btn btn-outline-primary btn-sm">View</a>
                                 <button type="button" class="btn btn-outline-success btn-sm">Unflag</button>
@@ -92,8 +93,8 @@
                             <div class="card-body">
                                 <h6 class="card-title"> ID: {{ key }}</h6>   <!-- Influencer id -->
                                 <p class="card-text">
-                                    Name: {{ value[0] }} {{ value[1] }}  <br>
-                                    Username: {{ value[2] }} <br>
+                                    Name: {{ value.fname }} {{ value.lname }}  <br>
+                                    Username: {{ value.username }} <br>
                                 </p>
                                 <a href="/templates/influencer_dashboard.html" class="btn btn-outline-primary btn-sm">View</a>
                                 <button type="button" class="btn btn-outline-success btn-sm">Unflag</button>
@@ -117,8 +118,8 @@
                             <div class="card-body">
                                 <h6 class="card-title"> ID: {{ key }}</h6>     <!-- Sponsor id -->
                                 <p class="card-text">
-                                    Name: {{ value[0] }} {{ value[1] }} <br>
-                                    Username: {{ value[2] }} <br>
+                                    Name: {{ value.fname }} {{ value.lname }} <br>
+                                    Username: {{ value.username }} <br>
                                 </p>
                                 <a href="/templates/sponsor_dashboard.html" class="btn btn-outline-primary btn-sm">View</a>
                                 <button type="button" class="btn btn-outline-success btn-sm">Unflag</button>
