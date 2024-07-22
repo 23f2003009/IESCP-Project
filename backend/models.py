@@ -13,6 +13,7 @@ class Sponsor(db.Model):
     budget = db.Column(db.Float, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
     type = db.Column(db.Enum('company', 'individual'), nullable=False)
+    # add functionality for inputting the name and details of company if associated with a company
     flagged = db.Column(db.Boolean, default=False)
     campaign = db.relationship('Campaign', backref='sponsor')
 

@@ -54,28 +54,28 @@
                     Social Media Platforms' Presence
                 </div>
                 <div class="col-md-3">
-                    <input class="form-check-input" type="checkbox" id="instagram" name="instagram">
+                    <input class="form-check-input" type="checkbox" id="instagram" name="social_accounts" value="instagram">
                     <label class="form-check-label" for="instagram">Instagram</label>
                     <input type="number" class="form-control" id="instagramFollowers" name="instagramFollowers" placeholder="Followers count">
                     <input type="text" class="form-control" id="instagramProfile" name="instagramProfile" placeholder="Profile link">
                 </div>
 
                 <div class="col-md-3">
-                    <input class="form-check-input" type="checkbox" id="twitter" name="twitter">
+                    <input class="form-check-input" type="checkbox" id="twitter" name="social_accounts" value="twitter">
                     <label class="form-check-label" for="twitter">Twitter</label>
                     <input type="number" class="form-control" id="twitterFollowers" name="twitterFollowers" placeholder="Followers count">
                     <input type="text" class="form-control" id="twitterProfile" name="twitterProfile" placeholder="Profile link">
                 </div>
 
                 <div class="col-md-3">
-                    <input class="form-check-input" type="checkbox" id="youtube" name="youtube">
+                    <input class="form-check-input" type="checkbox" id="youtube" name="social_accounts" value="youtube">
                     <label class="form-check-label" for="youtube">YouTube</label>
                     <input type="number" class="form-control" id="youtubeFollowers" name="youtubeFollowers" placeholder="Followers count">
                     <input type="text" class="form-control" id="youtubeProfile" name="youtubeProfile" placeholder="Channel link">
                 </div>
 
                 <div class="col-md-3">
-                    <input class="form-check-input" type="checkbox" id="linkedin" name="linkedin">
+                    <input class="form-check-input" type="checkbox" id="linkedin" name="social_accounts" value="linkedin">
                     <label class="form-check-label" for="linkedin">LinkedIn</label>
                     <input type="number" class="form-control" id="linkedinFollowers" name="linkedinFollowers" placeholder="Followers count">
                     <input type="text" class="form-control" id="linkedinProfile" name="linkedinProfile" placeholder="Profile link">
@@ -141,7 +141,7 @@
                     <button type="submit" class="btn btn-success"> Register </button>
                 </div>
                 
-                <div class="text-danger"> <br> {{ error }} <br> </div>
+                <div class="text-danger">{{ error }}</div>
 
                 <div class="col-12">
                     Already registered? <a href="/user_login" class="btn btn-outline-secondary btn-sm">Login</a>

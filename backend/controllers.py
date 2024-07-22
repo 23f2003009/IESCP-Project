@@ -21,7 +21,7 @@ def user_login():
                 return render_template('sponsor_dashboard.html', first_name=sponsor.first_name, last_name=sponsor.last_name, 
                                        sponsor_id=sponsor.id,
                                        active_campaigns=fetch_active_campaigns(sponsor.id), 
-                                       pending_ad_requests=fetch_pending_ad_requests(sponsor.id))
+                                       pending_ad_requests=fetch_pending_ad_requests_for_sponsor(sponsor.id))
             else:
                 return render_template('user_login', error='You have been flagged! Can\'t login.')
         
@@ -29,7 +29,8 @@ def user_login():
         influencer = Influencer.query.filter_by(username=username, password=password).first()
         if influencer:
             if not influencer.flagged:
-                return render_template('influencer_dashboard.html')
+                return render_template('influencer_dashboard.html', influencer_id=influencer.id, influencer_info=fetch_influencer_details(influencer.id),
+                                       active_ads=fetch_active_ads(influencer.id), pending_ads=fetch_pending_ad_requests_for_influencer(influencer.id))
             else:
                 return render_template('user_login.html', error='You have been flagged! Can\'t login.')
         
@@ -47,7 +48,8 @@ def admin_login():
 
         admin = Admin.query.filter_by(username=username, password=password).first()
         if admin:
-            return render_template('admin_dashboard.html', active_campaigns=fetch_active_campaigns(), flagged_campaigns=fetch_flagged_campaigns(), flagged_influencers=fetch_flagged_influencers(), flagged_sponsors=fetch_flagged_sponsors())
+            return render_template('admin_dashboard.html', active_campaigns=fetch_active_campaigns(), flagged_campaigns=fetch_flagged_campaigns(), 
+                                   flagged_influencers=fetch_flagged_influencers(), flagged_sponsors=fetch_flagged_sponsors())
         return render_template('admin_login.html',error='Invalid credentials!')
     
     return render_template('admin_login.html', error='')
@@ -55,12 +57,14 @@ def admin_login():
 
 @app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
-    return render_template('admin_dashboard.html', active_campaigns=fetch_active_campaigns(), flagged_campaigns=fetch_flagged_campaigns(), flagged_influencers=fetch_flagged_influencers(), flagged_sponsors=fetch_flagged_sponsors())
+    return render_template('admin_dashboard.html', active_campaigns=fetch_active_campaigns(), flagged_campaigns=fetch_flagged_campaigns(), 
+                           flagged_influencers=fetch_flagged_influencers(), flagged_sponsors=fetch_flagged_sponsors())
 
 
 @app.route('/admin_find', methods=['GET', 'POST'])
 def admin_find():
-    return render_template('admin_find.html', active_campaigns=fetch_active_campaigns(), completed_campaigns=fetch_completed_campaigns(), all_influencers=fetch_all_influencers(), all_sponsors=fetch_all_sponsors())
+    return render_template('admin_find.html', active_campaigns=fetch_active_campaigns(), completed_campaigns=fetch_completed_campaigns(), 
+                           all_influencers=fetch_all_influencers(), all_sponsors=fetch_all_sponsors())
 
 @app.route('/campaign_details/<int:camp_id>', methods=['GET', 'POST'])
 def particular_campaign_details(camp_id):
@@ -79,42 +83,54 @@ def influencer_signup():
         password = request.form.get('password')
 
         # checking if an influencer with the same username already exists; if not, adding the influencer in the database
-        user = Influencer.query.filter_by(username=username).first()
-        if user:
-            return render_template('influencer_registration.html', error='A user with this username already exists!')
+        influencer = Influencer.query.filter_by(username=username).first()
+        if influencer:
+            return render_template('influencer_registration.html', error='An influencer with this username already exists!')
         
-        # collecting the reach(social media accounts)
-        if 'instagram' in request.form:
-            followers = request.form.get('instagramFollowers')
-            profile_link = request.form.get('instagramProfile')
-            reach = Reach(influencer_id='#', platform='Instagram', followers=followers, profile_link=profile_link)
+        influencer = Influencer(first_name=first_name, last_name=last_name, age=age, email=email, username=username, password=password)
+        db.session.add(influencer)
+        db.session.commit()
+        
+        # retieving the reach information (social media accounts)
+        influencer_id = influencer.id            # getting the ID of the newly added influencer
+        social_accounts = request.form.getlist('social_accounts')
+        for platform in social_accounts:
+            followers = request.form.get(f'{platform}Followers')
+            profile_link = request.form.get(f'{platform}Profile')
+            reach = Reach(influencer_id=influencer_id, platform=platform, followers=followers, profile_link=profile_link)
+            db.session.add(reach)
+            db.session.commit()
 
-        if 'twitter' in request.form:
-            followers = request.form.get('twitterFollowers')
-            profile_link = request.form.get('twitterProfile')
-            reach = Reach(influencer_id='#', platform='Twitter', followers=followers, profile_link=profile_link)
-
-        if 'youtube' in request.form:
-            followers = request.form.get('youtubeFollowers')
-            profile_link = request.form.get('youtubeProfile')
-            reach = Reach(influencer_id='#', platform='Youtube', followers=followers, profile_link=profile_link)
-
-        if 'linkedin' in request.form:
-            followers = request.form.get('linkedinFollowers')
-            profile_link = request.form.get('linkedinProfile')
-            reach = Reach(influencer_id='#', platform='Linkedin', followers=followers, profile_link=profile_link)
-
-        # collecting niche info
+        # collecting niche information
         niches = request.form.getlist('niches')
         for niche_name in niches:
-            pass
+            niche = Niche.query.filter_by(name=niche_name).first()
+            if not niche:
+                niche = Niche(name=niche_name)
+                db.session.add(niche)
+                db.session.commit()
+                
+            influencer_niche = Influencer_Niche(influencer_id=influencer_id, niche_id=niche.id)
+            db.session.add(influencer_niche)
+            db.session.commit()
         
-        user = Influencer(first_name=first_name, last_name=last_name, age=age, email=email, username=username, password=password)
-        db.session.add(user)
-        db.session.commit()
-        return render_template('influencer_login.html', error='')
+        return render_template('user_login.html', error='')
 
     return render_template('influencer_registration.html', error='')
+
+
+@app.route('/influencer_dashboard/<int:influencer_id>', methods=['GET', 'POST'])
+def influencer_dashboard(influencer_id):
+    influencer = Influencer.query.filter_by(id=influencer_id).first()
+    return render_template('influencer_dashboard.html', influencer_id=influencer_id, influencer_info=fetch_influencer_details(influencer_id),
+                        active_ads=fetch_active_ads(influencer_id), pending_ads=fetch_pending_ad_requests_for_influencer(influencer_id),
+                        fname=influencer.first_name, lname=influencer.last_name)
+
+
+@app.route('/influencer_find/<int:influencer_id>', methods=['GET', 'POST'])
+def influencer_find(influencer_id):
+    influencer = Influencer.query.filter_by(id=influencer_id).first()
+    return render_template('influencer_find.html', fname=influencer.first_name, lname=influencer.last_name, influencer_id=influencer_id, all_influencers=fetch_influencer_details_for_sponsor())
 
 
 @app.route('/sponsor_signup', methods=['GET', 'POST'])
@@ -130,15 +146,15 @@ def sponsor_signup():
         password = request.form.get('password')
         type = request.form.get('type')
 
-        # checking if a sponsor with the same username already exists; if not, adding the influencer in the database
-        user = Sponsor.query.filter_by(username=username).first()
-        if user:
-            return render_template('sponsor_registration.html', error='A user with this username already exists!')
+        # checking if a sponsor with the same username already exists; if not, adding the sponsor in the database
+        sponsor = Sponsor.query.filter_by(username=username).first()
+        if sponsor:
+            return render_template('sponsor_registration.html', error='A sponsor with this username already exists!')
         
-        user = Sponsor(first_name=first_name, last_name=last_name, email=email, username=username, password=password, industry=industry, budget=budget, type=type)
-        db.session.add(user)
+        sponsor = Sponsor(first_name=first_name, last_name=last_name, email=email, username=username, password=password, industry=industry, budget=budget, type=type)
+        db.session.add(sponsor)
         db.session.commit()
-        return render_template('sponsor_login.html', error='')
+        return render_template('user_login.html', error='')
     
     return render_template('sponsor_registration.html')
 
@@ -148,7 +164,7 @@ def sponsor_dashboard(sponsor_id):
     sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
     return render_template('sponsor_dashboard.html', sponsor_id=sponsor_id, first_name=sponsor.first_name, last_name=sponsor.last_name,
                            active_campaigns=fetch_active_campaigns(sponsor_id), 
-                           pending_ad_requests=fetch_pending_ad_requests(sponsor_id))
+                           pending_ad_requests=fetch_pending_ad_requests_for_sponsor(sponsor_id))
 
 
 @app.route('/sponsor_find/<int:sponsor_id>', methods=['GET', 'POST'])
@@ -159,13 +175,16 @@ def sponsor_find(sponsor_id):
 
 @app.route('/campaign_details/<int:sponsor_id>/<int:camp_id>', methods=['GET', 'POST'])
 def particular_campaign_details_for_sponsor(sponsor_id, camp_id):
-    return render_template('sponsor_campaign_details.html', sponsor_id=sponsor_id, campaign_info=fetch_campaign_details(camp_id))
+    sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
+    return render_template('sponsor_campaign_details.html', sponsor_id=sponsor_id, campaign_info=fetch_campaign_details(camp_id),
+                           first_name=sponsor.first_name, last_name=sponsor.last_name)
 
 
 @app.route('/sponsor_all_campaigns/<int:sponsor_id>', methods=['GET', 'POST'])
 def sponsor_all_campaigns(sponsor_id):
-    return render_template('sponsor_all_campaigns.html', active_campaigns=fetch_active_campaigns(sponsor_id), 
-                           sponsor_id=sponsor_id, completed_campaigns=fetch_completed_campaigns(sponsor_id))
+    sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
+    return render_template('sponsor_all_campaigns.html', active_campaigns=fetch_active_campaigns(sponsor_id), sponsor_id=sponsor_id, 
+                           first_name=sponsor.first_name, last_name=sponsor.last_name, completed_campaigns=fetch_completed_campaigns(sponsor_id))
 
 
 # more routes
@@ -260,7 +279,7 @@ def fetch_completed_campaigns(sponsor_id=None):
     return completed_campaigns
 
 '''function for retrieving pending ad requests for sponsor dashboard'''
-def fetch_pending_ad_requests(id):
+def fetch_pending_ad_requests_for_sponsor(id):
     ad_requests = (db.session.query(
                    Ad_Request.id, Ad_Request.title.label('ad_title'),
                    Campaign.title.label('campaign_title'),
@@ -324,3 +343,65 @@ def fetch_campaign_details(camp_id):
                                                                 'payment_amount': campaign.payment_amount, 'influencer_fname': campaign.first_name, 
                                                                 'influencer_lname': campaign.last_name, 'status': campaign.status, 'niche': campaign.niche_name}
             return campaign_info
+        
+'''function for retrieving influencer details for influencer_dashboard'''
+def fetch_influencer_details(influencer_id):
+    influencer = Influencer.query.filter_by(id=influencer_id).first()
+    influencer_info = {influencer.id: {}}
+    influencer_info[influencer.id] = {'fname': influencer.first_name, 'lname': influencer.last_name, 'username': influencer.username,
+                                      'email': influencer.email, 'profile_pic': influencer.profile_pic, 'earning':influencer.earning,
+                                      'social_accounts':social_accounts(influencer_id)}
+    return influencer_info
+
+'''function for retrieving social accounts of an influencer'''
+def social_accounts(influencer_id):
+    tuples = (db.session.query(Influencer.id, Reach.platform, Reach.followers, Reach.profile_link)
+                  .join(Reach, Reach.influencer_id==influencer_id).all())
+    social_accounts = {}
+    for tuple in tuples:
+        if tuple.platform not in social_accounts.keys():
+            social_accounts[tuple.platform] = {'followers': tuple.followers, 'profile_link': tuple.profile_link}
+    return social_accounts
+
+'''function for retrieving active ad_requests' details for influencer_dashboard'''
+def fetch_active_ads(influencer_id):
+    current_date = datetime.now().date()
+    ads = (db.session.query(Ad_Request.id, Ad_Request.title.label('ad_title'), Ad_Request.payment_amount, Ad_Request.requirement,
+                            Campaign.title.label('campaign_title'), Campaign.description, Campaign.goal, Campaign.start_date, Campaign.end_date,
+                            Sponsor.first_name, Sponsor.last_name, Sponsor.type, Niche.name.label('niche_name'))
+                            .join(Campaign, Campaign.id==Ad_Request.campaign_id)
+                            .join(Sponsor, Campaign.sponsor_id==Sponsor.id)
+                            .join(Niche, Ad_Request.niche_id==Niche.id)
+                            .filter(Campaign.start_date <= current_date, Campaign.end_date >= current_date,
+                                    Ad_Request.influencer_id==influencer_id, Campaign.flagged==False, Ad_Request.status=='accepted').all())
+    active_ads = {}
+    for ad in ads:
+        if ad.id not in active_ads.keys():
+            active_ads[ad.id] = {'ad_title':ad.ad_title, 'payment_amount': ad.payment_amount, 'ad_requirement': ad.requirement, 
+                                 'campaign_title': ad.campaign_title, 'campaign_description': ad.description, 'sdate': ad.start_date, 'edate': ad.end_date,
+                                 'sponsor_fname': ad.first_name, 'sponsor_lname': ad.last_name, 'sponsor_type': ad.type, 'niche': ad.niche_name}
+    return active_ads
+
+'''function for retreiving pending ad_requests for influencer_dashboard'''
+def fetch_pending_ad_requests_for_influencer(influencer_id):
+    current_date = datetime.now().date()
+    ads = (db.session.query(Ad_Request.id, Ad_Request.title.label('ad_title'), Ad_Request.payment_amount, Ad_Request.requirement,
+                            Campaign.title.label('campaign_title'), Campaign.description, Campaign.goal, Campaign.start_date, Campaign.end_date,
+                            Sponsor.first_name, Sponsor.last_name, Sponsor.type, Niche.name.label('niche_name'))
+                            .join(Campaign, Campaign.id==Ad_Request.campaign_id)
+                            .join(Sponsor, Campaign.sponsor_id==Sponsor.id)
+                            .join(Niche, Ad_Request.niche_id==Niche.id)
+                            .filter(Ad_Request.influencer_id==influencer_id, Campaign.flagged==False, Ad_Request.status=='pending').all())
+    pending_ads = {}
+    for ad in ads:
+        if ad.id not in pending_ads.keys():
+            pending_ads[ad.id] = {'ad_title':ad.ad_title, 'payment_amount': ad.payment_amount, 'ad_requirement': ad.requirement, 
+                                 'campaign_titile': ad.campaign_title, 'campaign_description': ad.description, 'sdate': ad.start_date, 'edate': ad.end_date,
+                                 'sponsor_fname': ad.first_name, 'sponsor_lname': ad.last_name, 'sponsor_type': ad.type, 'niche': ad.niche_name}
+    return pending_ads
+
+'''function for retreiving the ad requests of all public campaigns and those private campaigns that have matching niche with influencer and are active'''
+def fetch_all_ads():
+    pass
+
+'''function for retreiving all public active campaigns'''

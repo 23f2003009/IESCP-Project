@@ -15,11 +15,11 @@
         <div id="panel">
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
                 <div class="container-fluid">
-                    <label class="navbar-brand">Influencer 01 Dashboard</label>
+                    <label class="navbar-brand">{{ fname }} {{ lname }}'s Dashboard</label>
                     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                         <div class="navbar-nav">
-                            <a class="nav-link active" href="/templates/influencer_dashboard.html">Profile</a>
-                            <a class="nav-link" href="/templates/influencer_find.html">Find</a>
+                            <a class="nav-link active" href="/influencer_dashboard/{{ influencer_id }}">Profile</a>
+                            <a class="nav-link" href="/influencer_find/{{ influencer_id }}">Find</a>
                             <a class="nav-link" href="#">Statistics</a>
                             <a class="nav-link" href="#">Logout</a>
                         </div>
@@ -30,47 +30,67 @@
 
         <div class="container">
             <div class="row my-4">
-                <div class="col-4 card">
-                    <div class="row-8 my-4 card">
-                        Profile pic <br> Profile pic <br>Profile pic <br> Profile pic
-                    </div>
-                    <div class="row-2 card">
-                        name: <br>
-                        username: <br>
-                        email: <br>
-                        earnings so far: <br>
-                        accounts associated: Insta, Twitter etc<br>
 
+                {% for key, value in influencer_info.items() %}
+                    <div class="col-4 card">
+                        <div class="row-8 my-4 card">
+                            <img src="{{ url_for('static', filename='profile_pics/' ~ value.profile_pic) }}" alt="Profile Pic" class="img-fluid">
+                        </div>
+                        <div class="row-2 card">
+                            Name: {{ value.fname }} {{ value.lname }} <br>
+                            Username: {{ value.username }} <br>
+                            Email: {{ value.email }} <br>
+                            Earnings so far: {{ value.earning }} <br>
+                            Associated Social accounts: <br>
+                            <ul>
+                                {% for platform, details in value.social_accounts.items() %}
+                                    <li> {{ platform | capitalize }}:
+                                        <li> Followers: {{ details.followers}}</li>
+                                        <li> Profile Link: <a href="{{ details.profile_link }}"> Go to profile </a> </li>
+                                    </li>
+                                {% endfor %}
+                            </ul> 
+                        </div>
                     </div>
-                </div>
+                {% endfor %}
 
                 <div class="col-8 card">
                     <div class="row">
-                        <h4 class="text-center mt-2">Welcome Influencer 01</h4>
+                        <h4 class="text-center mt-2">Welcome {{ fname }} {{ lname }}</h4>
                     </div>
 
                     <div class="row">
                         <!-- ACTIVE AD REQUESTS -->
                         <div class="row">
                             <h5 class="text-center"><br>Active Ads</h5>
-                            <div class="col-sm-6">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h6 class="card-title">Ad Request 01</h6>
-                                        <p class="card-text">
-                                            Ad title: <br>
-                                            Ad progress: 
-                                            <div class="progress">
-                                                <!-- replace 25 by {{ progress }}% -->
-                                                <!-- progress on the basis of start-end date -->
-                                                <div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
-                                            </div>                                            
-                                        </p>
-                                        <!-- VIEW ACTIVE AD REQ MODAL TRIGGER BUTTON -->
-                                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewActiveAdRequestModal">View</a>
+
+                            {% if active_ads %}
+                                {% for key, value in active_ads %}
+                                <div class="col-sm-6">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Ad Title: {{ value.ad_title }}</h6>
+                                            <p class="card-text">
+                                                Associated Campaign Title: {{ value.campaign_title }} <br>
+                                                Payment Amount: {{ value.payemnt_amount }} 
+                                                Ad progress: 
+                                                <div class="progress">
+                                                    <!-- replace 25 by {{ progress }}% -->
+                                                    <!-- progress on the basis of start-end date -->
+                                                    <div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+                                                </div>                                            
+                                            </p>
+                                            <!-- VIEW ACTIVE AD REQ MODAL TRIGGER BUTTON -->
+                                            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewActiveAdRequestModal">View</a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                                {% endfor %}
+
+                            {% else %}
+                                <h5 class="text-secondary text-center">You have no active ads.</h5>
+                            {% endif %}
+
                         </div>
                     </div>
 
@@ -78,20 +98,36 @@
                         <!-- NEW REQUESTS -->
                         <div class="row">
                             <h5 class="text-center"><br>New Requests</h5>
-                            <div class="col-sm-4 mb-2">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h6 class="card-title">Campaign 01 | Ad 01 </h6>
-                                        <!-- VIEW NEW AD REQUEST MODAL TRIGGER BUTTON -->
-                                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewNewAdRequestModal">View</button>
-                                        <button type="button" class="btn btn-outline-success btn-sm">Accept</button>
-                                        <button type="button" class="btn btn-outline-danger btn-sm">Reject</button>
+
+                            {% if pending_ads %}
+                                {% for key, value in pending_ads %}
+                                <div class="col-sm-4 mb-2">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h6 class="card-title">Ad Title: {{ value.ad_title }} </h6>
+                                            <p class="card-text">
+                                                Associated Campaign Title: {{ value.campaign_title }}
+                                                Requesting Sponsor: {{ value.sponsor_fname }}{{ value.sponsor_lname }}
+                                                Payment Amount: {{ value.payemnt_amount }} 
+                                            </p>
+                                            <!-- VIEW NEW AD REQUEST MODAL TRIGGER BUTTON -->
+                                            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewNewAdRequestModal">View</button>
+                                            <button type="button" class="btn btn-outline-success btn-sm">Accept</button>
+                                            <button type="button" class="btn btn-outline-danger btn-sm">Reject</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                                {% endfor %}
+                            
+                            {% else %}
+                                <h5 class="text-secondary text-center">You have no new ad requests.</h5>
+                            {% endif %}
+
                         </div>
                     </div>
                 </div>
+
+
             </div>
         </div>
 
