@@ -146,19 +146,19 @@ def sponsor_signup():
 @app.route('/sponsor_dashboard/<int:sponsor_id>', methods=['GET', 'POST'])
 def sponsor_dashboard(sponsor_id):
     sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
-    return render_template('sponsor_dashboard.html', first_name=sponsor.first_name, last_name=sponsor.last_name, sponsor_id=sponsor_id,
+    return render_template('sponsor_dashboard.html', sponsor_id=sponsor_id, first_name=sponsor.first_name, last_name=sponsor.last_name,
                            active_campaigns=fetch_active_campaigns(sponsor_id), 
                            pending_ad_requests=fetch_pending_ad_requests(sponsor_id))
 
 
 @app.route('/sponsor_find/<int:sponsor_id>', methods=['GET', 'POST'])
 def sponsor_find(sponsor_id):
-    sponsor = Sponsor.query.filter_by(id=sponsor_id)
+    sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
     return render_template('sponsor_find.html', first_name=sponsor.first_name, last_name=sponsor.last_name, sponsor_id=sponsor_id, all_influencers=fetch_influencer_details_for_sponsor())
 
 
 @app.route('/campaign_details/<int:sponsor_id>/<int:camp_id>', methods=['GET', 'POST'])
-def particular_campaign_details(sponsor_id, camp_id):
+def particular_campaign_details_for_sponsor(sponsor_id, camp_id):
     return render_template('sponsor_campaign_details.html', sponsor_id=sponsor_id, campaign_info=fetch_campaign_details(camp_id))
 
 

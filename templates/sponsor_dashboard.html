@@ -17,7 +17,7 @@
                     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                         <div class="navbar-nav">
                             <a class="nav-link active" aria-current="page" href="/sponsor_dashboard/{{ sponsor_id }}">Profile</a>
-                            <a class="nav-link" href="/templates/sponsor_all_campaigns.html">Campaign</a>
+                            <a class="nav-link" href="/sponsor_all_campaigns/{{ sponsor_id }}">Campaign</a>
                             <a class="nav-link" href="/sponsor_find/{{ sponsor_id }}">Find</a>
                             <a class="nav-link" href="#">Statistics</a>
                             <a class="nav-link" href="#">Logout</a>
@@ -78,7 +78,7 @@
                     </div>
                 {% endfor %}
             {% else %}
-                <h5>No pending requests for you</h5>
+                <h5 class="text-secondary">No pending requests for you</h5>
             {% endif %}
         </div>
     </div>
