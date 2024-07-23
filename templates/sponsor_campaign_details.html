@@ -33,8 +33,11 @@
 
         
         <!-- CAMPAIGN DESCRIPTION -->
-        {% if campaign_info %}
-            {% for key, value in campaign_info.items() %}
+        {% for key, value in campaign_info.items() %}
+            {% if value.flagged %}
+                <h4 class="text-danger">The campaign has been flagged for inapropriate content!</h4>
+
+            {% else %}
                 <div class="container row mt-4">
                     <h4>{{ value.title }}</h4>
                     <p>
@@ -69,11 +72,9 @@
                         </div>
                     {% endfor %}
                 </div>
-            {% endfor %}
+            {% endif %}
 
-        {% else  %}
-            <h4 class="text-danger">The campaign has been flagged for inapropriate content!</h4>
-        {% endif %}
+        {% endfor %}
 
 
         <!-- ADD AD REQUEST MODAL TRIGGER BUTTON -->

@@ -187,6 +187,69 @@ def sponsor_all_campaigns(sponsor_id):
                            first_name=sponsor.first_name, last_name=sponsor.last_name, completed_campaigns=fetch_completed_campaigns(sponsor_id))
 
 
+@app.route('/add_campaign/<int:sponsor_id>', methods=['GET', 'POST'])
+def add_campaign(sponsor_id):
+    title = request.form.get('campaignTitle')
+    description = request.form.get('campaignDescription')
+    budget = request.form.get('campaignBudget')
+    start_date_str = request.form.get('campaignStartDate')
+    end_date_str = request.form.get('campaignEndDate')
+    visibility = request.form.get('campaignVisibility')
+    goal = request.form.get('campaignGoal')
+
+    start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+    end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+
+    new_campaign = Campaign(title=title, description=description, budget=budget, start_date=start_date, end_date=end_date, 
+                            visibility=visibility, goal=goal, sponsor_id=sponsor_id)
+    db.session.add(new_campaign)
+    db.session.commit()
+
+    sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
+    return render_template('sponsor_all_campaigns.html', active_campaigns=fetch_active_campaigns(sponsor_id), sponsor_id=sponsor_id, 
+                           first_name=sponsor.first_name, last_name=sponsor.last_name, completed_campaigns=fetch_completed_campaigns(sponsor_id))
+
+
+@app.route('/edit_campaign/<int:sponsor_id>/<int:camp_id>', methods=['GET', 'POST'])
+def edit_campaign(sponsor_id, camp_id):
+    title = request.form.get('campaignTitle')
+    description = request.form.get('campaignDescription')
+    budget = request.form.get('campaignBudget')
+    start_date = request.form.get('campaignStartDate')
+    end_date = request.form.get('campaignEndDate')
+    visibility = request.form.get('campaignVisibility')
+    goal = request.form.get('campaignGoal')
+
+    # locate the record where the edits are to be made
+    existing_campaign = Campaign.query.filter_by(id=camp_id).first()
+
+    existing_campaign.title = title
+    existing_campaign.description = description
+    existing_campaign.budget = budget
+    existing_campaign.start_date =  datetime.strptime(start_date, '%Y-%m-%d').date()
+    existing_campaign.end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+    existing_campaign.visibility = visibility
+    existing_campaign.goal = goal
+
+    db.session.commit()
+
+    sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
+    return render_template('sponsor_all_campaigns.html', active_campaigns=fetch_active_campaigns(sponsor_id), sponsor_id=sponsor_id, 
+                           first_name=sponsor.first_name, last_name=sponsor.last_name, completed_campaigns=fetch_completed_campaigns(sponsor_id))
+
+
+@app.route('/delete_campaign/<int:sponsor_id>/<int:camp_id>', methods=['GET', 'POST'])
+def delete_campaign(sponsor_id, camp_id):
+    existing_campaign = Campaign.query.filter_by(id=camp_id).first()
+    if existing_campaign:
+        db.session.delete(existing_campaign)
+        db.session.commit()
+    
+    sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
+    return render_template('sponsor_all_campaigns.html', active_campaigns=fetch_active_campaigns(sponsor_id), sponsor_id=sponsor_id, 
+                           first_name=sponsor.first_name, last_name=sponsor.last_name, completed_campaigns=fetch_completed_campaigns(sponsor_id))
+
+
 # more routes
 
 
@@ -211,7 +274,8 @@ def fetch_active_campaigns(sponsor_id=None):
     for campaign in campaigns:
         if campaign.id not in active_campaigns.keys():
             active_campaigns[campaign.id] = {'title': campaign.title, 'description': campaign.description,'goal': campaign.goal,
-                                            'start_date': campaign.start_date, 'end_date': campaign.end_date}
+                                            'start_date': campaign.start_date, 'end_date': campaign.end_date, 'budget': campaign.budget,
+                                            'visibility': campaign.visibility}
     return active_campaigns
 
 '''function for retrieving all flagged campaigns for admin dashboard'''
@@ -324,25 +388,22 @@ def fetch_campaign_details(camp_id):
                                 Ad_Request.payment_amount, Ad_Request.status,
                                 Niche.name.label('niche_name'),
                                 Influencer.first_name, Influencer.last_name)
-                                .join(Ad_Request, Ad_Request.campaign_id==Campaign.id)
-                                .join(Niche, Niche.id==Ad_Request.niche_id)
-                                .join(Influencer, Influencer.id==Ad_Request.influencer_id)
+                                .outerjoin(Ad_Request, Ad_Request.campaign_id==Campaign.id)
+                                .outerjoin(Niche, Niche.id==Ad_Request.niche_id)
+                                .outerjoin(Influencer, Influencer.id==Ad_Request.influencer_id)
                                 .filter(Campaign.id==camp_id).all())
     campaign_info = {}
     for campaign in campaigns:
-        if campaign.flagged:
-            return None
+        if campaign.campaign_id not in campaign_info.keys():
+            campaign_info[campaign.campaign_id] = {'title':campaign.campaign_title, 'description': campaign.description, 'goal': campaign.goal, 'start_date': campaign.start_date, 
+                                        'end_date': campaign.end_date,'visibility': campaign.visibility, 'budget': campaign.budget, 'flagged': campaign.flagged, 'ads': {}}
         
-        else:
-            if campaign.id not in campaign_info.keys():
-                campaign_info[campaign.id] = {'title':campaign.campaign_title, 'description': campaign.description, 'goal': campaign.goal, 'start_date': campaign.start_date, 
-                                            'end_date': campaign.end_date,'visibility': campaign.visibility, 'budget': campaign.budget, 'ads': {}}
-            
-            if campaign.ad_id not in campaign_info[campaign.id]['ads'].keys():
-                campaign_info[campaign.id]['ads'][campaign.ad_id] = {'title': campaign.ad_title, 'requirements': campaign.requirement, 
-                                                                'payment_amount': campaign.payment_amount, 'influencer_fname': campaign.first_name, 
-                                                                'influencer_lname': campaign.last_name, 'status': campaign.status, 'niche': campaign.niche_name}
-            return campaign_info
+        if campaign.ad_id not in campaign_info[campaign.campaign_id]['ads'].keys():
+            campaign_info[campaign.campaign_id]['ads'][campaign.ad_id] = {'title': campaign.ad_title, 'requirements': campaign.requirement, 
+                                                            'payment_amount': campaign.payment_amount, 'influencer_fname': campaign.first_name, 
+                                                            'influencer_lname': campaign.last_name, 'status': campaign.status, 'niche': campaign.niche_name}
+
+    return campaign_info
         
 '''function for retrieving influencer details for influencer_dashboard'''
 def fetch_influencer_details(influencer_id):
