@@ -39,6 +39,8 @@
                                 <h6 class="card-title">{{ value.title }}</h6>   <!-- Campaign Title -->
                                 <p class="card-text">
                                     Description: {{ value.description }} <br>
+                                    Goal: {{ value.goal }} <br>
+                                    Budget: {{ value.budget }}
                                 </p>
                                 <a href="/campaign_details/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
                                 <button type="button" class="btn btn-outline-danger btn-sm">Flag</button>
@@ -51,6 +53,31 @@
             {% endif %}
         </div>
 
+
+        <!-- SCHEDULED CAMPAIGN CARDS -->
+        <div class="container row">
+            <h5 class="text-center my-4">Scheduled Campaigns</h5>
+            {% if scheduled_campaigns %}
+                {% for key, value in scheduled_campaigns.items() %}
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ value.title }}</h6>
+                                <p class="card-text">
+                                    Description: {{ value.description }}<br>
+                                    Goal: {{ value.goal }} <br>
+                                    Budget: {{ value.budget }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h5 class="text-secondary">No campaigns scheduled.</h5>
+            {% endif %}
+        </div>
+
+
         <!-- COMPLETED CAMPAIGNS -->
         <div class="container row">
             <h5 class="text-center"><br>Completed Campaigns</h5>
@@ -62,6 +89,8 @@
                                 <h6 class="card-title">{{ value.title }}</h6>   <!-- Campaign Title -->
                                 <p class="card-text">
                                     Description: {{ value.description }} <br>
+                                    Goal: {{ value.goal }} <br>
+                                    Budget: {{ value.budget }}
                                 </p>
                                 <a href="admin_campaign_details.html" class="btn btn-outline-primary btn-sm">View</a>
                                 <button type="button" class="btn btn-outline-danger btn-sm">Flag</button>

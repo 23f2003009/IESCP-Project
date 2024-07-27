@@ -61,6 +61,32 @@
         </div>
 
 
+        <!-- SCHEDULED CAMPAIGN CARDS -->
+        <div class="container row">
+            <h5 class="text-center my-4">Scheduled Campaigns</h5>
+
+            {% if scheduled_campaigns %}
+                {% for key, value in scheduled_campaigns.items() %}
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ value.title }}</h6>
+                                <p class="card-text">
+                                    Description: {{ value.description }}<br>
+                                    Goal: {{ value.goal }} <br>
+                                    Budget: {{ value.budget }} <br>
+                                    Timeline: {{ value.start_date }} - {{ value.end_date }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h5 class="text-secondary">No campaigns scheduled.</h5>
+            {% endif %}
+        </div>
+
+
         <!-- COMPLETED CAMPAIGN CARDS -->
         <div class="container row">
             <h5 class="text-center my-4">Completed Campaigns</h5>
@@ -74,7 +100,8 @@
                                 <p class="card-text">
                                     Description: {{ value.description }}<br>
                                     Goal: {{ value.goal }} <br>
-                                    Budget: {{ value.budget }}
+                                    Budget: {{ value.budget }} <br>
+                                    Timeline: {{ value.start_date }} - {{ value.end_date }}
                                 </p>
                             </div>
                         </div>
@@ -143,9 +170,10 @@
             </div>
         </div>
 
+        
         {% for key, value in active_campaigns.items() %}
             <!-- EDIT CAMPAIGN MODAL -->
-            <div class="modal fade" id="editCampaignModal{{ key }}" tabindex="-1" aria-labelledby="editCampaignModalLabel" aria-hidden="true">
+            <div class="modal fade" id="editCampaignModal{{ key }}" tabindex="-1" aria-labelledby="editCampaignModalLabel{{ key }}" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -199,11 +227,11 @@
         
         {% for key, value in active_campaigns.items() %}
             <!-- DELETE CAMPAIGN MODAL -->
-            <div class="modal fade" id="deleteCampaignModal{{ key }}" tabindex="-1" aria-labelledby="deleteCampaignModalLabel" aria-hidden="true">
+            <div class="modal fade" id="deleteCampaignModal{{ key }}" tabindex="-1" aria-labelledby="deleteCampaignModalLabel{{ key }}" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="deleteCampaignModalLabel">Edit Campaign</h5>
+                            <h5 class="modal-title" id="deleteCampaignModalLabel{{ key }}">Edit Campaign</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">

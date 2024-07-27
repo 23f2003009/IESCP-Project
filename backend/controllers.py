@@ -64,7 +64,7 @@ def admin_dashboard():
 @app.route('/admin_find', methods=['GET', 'POST'])
 def admin_find():
     return render_template('admin_find.html', active_campaigns=fetch_active_campaigns(), completed_campaigns=fetch_completed_campaigns(), 
-                           all_influencers=fetch_all_influencers(), all_sponsors=fetch_all_sponsors())
+                           all_influencers=fetch_all_influencers(), all_sponsors=fetch_all_sponsors(), scheduled_campaigns=fetch_scheduled_campaigns())
 
 @app.route('/campaign_details/<int:camp_id>', methods=['GET', 'POST'])
 def particular_campaign_details(camp_id):
@@ -176,15 +176,16 @@ def sponsor_find(sponsor_id):
 @app.route('/campaign_details/<int:sponsor_id>/<int:camp_id>', methods=['GET', 'POST'])
 def particular_campaign_details_for_sponsor(sponsor_id, camp_id):
     sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
+    niches = Niche.query.all()
     return render_template('sponsor_campaign_details.html', sponsor_id=sponsor_id, campaign_info=fetch_campaign_details(camp_id),
-                           first_name=sponsor.first_name, last_name=sponsor.last_name)
+                           first_name=sponsor.first_name, last_name=sponsor.last_name, niches=niches)
 
 
 @app.route('/sponsor_all_campaigns/<int:sponsor_id>', methods=['GET', 'POST'])
 def sponsor_all_campaigns(sponsor_id):
     sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
     return render_template('sponsor_all_campaigns.html', active_campaigns=fetch_active_campaigns(sponsor_id), sponsor_id=sponsor_id, 
-                           first_name=sponsor.first_name, last_name=sponsor.last_name, completed_campaigns=fetch_completed_campaigns(sponsor_id))
+                           first_name=sponsor.first_name, last_name=sponsor.last_name, completed_campaigns=fetch_completed_campaigns(sponsor_id), scheduled_campaigns=fetch_scheduled_campaigns(sponsor_id))
 
 
 @app.route('/add_campaign/<int:sponsor_id>', methods=['GET', 'POST'])
@@ -207,7 +208,8 @@ def add_campaign(sponsor_id):
 
     sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
     return render_template('sponsor_all_campaigns.html', active_campaigns=fetch_active_campaigns(sponsor_id), sponsor_id=sponsor_id, 
-                           first_name=sponsor.first_name, last_name=sponsor.last_name, completed_campaigns=fetch_completed_campaigns(sponsor_id))
+                           first_name=sponsor.first_name, last_name=sponsor.last_name, completed_campaigns=fetch_completed_campaigns(sponsor_id),
+                           scheduled_campaigns=fetch_scheduled_campaigns(sponsor_id))
 
 
 @app.route('/edit_campaign/<int:sponsor_id>/<int:camp_id>', methods=['GET', 'POST'])
@@ -234,8 +236,9 @@ def edit_campaign(sponsor_id, camp_id):
     db.session.commit()
 
     sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
-    return render_template('sponsor_all_campaigns.html', active_campaigns=fetch_active_campaigns(sponsor_id), sponsor_id=sponsor_id, 
-                           first_name=sponsor.first_name, last_name=sponsor.last_name, completed_campaigns=fetch_completed_campaigns(sponsor_id))
+    return render_template('sponsor_all_campaigns.html', first_name=sponsor.first_name, last_name=sponsor.last_name, sponsor_id=sponsor_id, 
+                           active_campaigns=fetch_active_campaigns(sponsor_id), completed_campaigns=fetch_completed_campaigns(sponsor_id),
+                           scheduled_campaigns=fetch_scheduled_campaigns(sponsor_id))
 
 
 @app.route('/delete_campaign/<int:sponsor_id>/<int:camp_id>', methods=['GET', 'POST'])
@@ -247,15 +250,100 @@ def delete_campaign(sponsor_id, camp_id):
     
     sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
     return render_template('sponsor_all_campaigns.html', active_campaigns=fetch_active_campaigns(sponsor_id), sponsor_id=sponsor_id, 
-                           first_name=sponsor.first_name, last_name=sponsor.last_name, completed_campaigns=fetch_completed_campaigns(sponsor_id))
+                           first_name=sponsor.first_name, last_name=sponsor.last_name, completed_campaigns=fetch_completed_campaigns(sponsor_id), 
+                           scheduled_campaigns=fetch_scheduled_campaigns(sponsor_id))
 
+
+@app.route('/new_ad_request/<int:sponsor_id>/<int:camp_id>', methods=['GET', 'POST'])
+def create_ad_request(sponsor_id, camp_id):
+    niches = Niche.query.all()
+    sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
+
+    # getting values from form
+    title = request.form.get('adTitle')
+    payment_amount = request.form.get('adPaymentAmount')
+    requirement = request.form.get('adRequirement')
+    niche_id = request.form.get('adNiche')
+
+    # check if others is selected as a niche
+    if niche_id == 'other':
+        new_niche_name = request.form.get('otherNiche')
+        new_niche = Niche(name=new_niche_name)
+        db.session.add(new_niche)
+        db.session.commit()
+        niche_id = new_niche.id
+
+    # creating new ad request
+    new_ad_request = Ad_Request(title=title, requirement=requirement, payment_amount=payment_amount, niche_id=niche_id, campaign_id=camp_id)
+    db.session.add(new_ad_request)
+    db.session.commit()
+
+    return render_template('sponsor_campaign_details.html', sponsor_id=sponsor_id, campaign_info=fetch_campaign_details(camp_id),
+                    first_name=sponsor.first_name, last_name=sponsor.last_name, niches=niches)
+
+
+@app.route('/find_influencer_for_ad/<int:sponsor_id>/<int:camp_id>/<int:ad_id>', methods=['GET','POST'])
+def find_influencer_for_ads(sponsor_id, camp_id, ad_id):
+    sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
+    return render_template('sponsor_ad_request_influencer.html', sponsor_id=sponsor_id, first_name=sponsor.first_name, last_name=sponsor.last_name,
+                    all_influencers=fetch_influencer_details_for_sponsor(), camp_id=camp_id, ad_request_id=ad_id)
+    
+
+@app.route('/request_influencer_for_ad/<int:sponsor_id>/<int:camp_id>/<int:ad_id>/<int:influencer_id>', methods=['GET','POST'])
+def request_influencer_for_ad(sponsor_id, camp_id, ad_id, influencer_id):
+    ad_request = Ad_Request.query.filter_by(id=ad_id).first()
+    ad_request.influencer_id = influencer_id
+    db.session.commit()
+
+    niches = Niche.query.all()
+    sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
+    return render_template('sponsor_campaign_details.html', sponsor_id=sponsor_id, campaign_info=fetch_campaign_details(camp_id),
+                           first_name=sponsor.first_name, last_name=sponsor.last_name, niches=niches)
+
+
+@app.route('/edit_ad/<int:sponsor_id>/<int:camp_id>/<int:ad_id>', methods=['GET', 'POST'])
+def edit_ad_request(sponsor_id, camp_id, ad_id):
+    niches = Niche.query.all()
+    sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
+
+    # getting values from form
+    title = request.form.get('adTitle')
+    payment_amount = request.form.get('adPaymentAmount')
+    requirement = request.form.get('adRequirement')
+    niche_id = request.form.get('adNiche')
+
+    # locate the record where the edits are to be made
+    existing_ad = Ad_Request.query.filter_by(id=ad_id).first()
+
+    existing_ad.title = title
+    existing_ad.payment_amount = payment_amount
+    existing_ad.niche_id = niche_id
+    existing_ad.requirement = requirement
+
+    db.session.commit()
+
+    return render_template('sponsor_campaign_details', sponsor_id=sponsor_id, campaign_info=fetch_campaign_details(camp_id),
+                    first_name=sponsor.first_name, last_name=sponsor.last_name, niches=niches)
+
+
+@app.route('/delete_ad/<int:sponsor_id>/<int:camp_id>/<int:ad_id>', methods=['GET', 'POST'])
+def delete_ad_request(sponsor_id, camp_id, ad_id):
+    existing_ad = Ad_Request.query.filter_by(id=ad_id)
+    if existing_ad:
+        db.session.delete(existing_ad)
+        db.session.commit()
+
+    niches = Niche.query.all()
+    sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
+    return render_template('sponsor_campaign_details', sponsor_id=sponsor_id, campaign_info=fetch_campaign_details(camp_id),
+                    first_name=sponsor.first_name, last_name=sponsor.last_name, niches=niches)
 
 # more routes
 
 
 # ---------------------------------------------------------- USER DEFINED FUNCTIONS ---------------------------------------------------------- #
 
-'''function for retrieving all (unflagged) active campaigns'''
+'''function for retrieving all (unflagged) active campaigns for sposnor_all_campaigns and admin_find page'''
 def fetch_active_campaigns(sponsor_id=None):
     current_date = datetime.now().date()
 
@@ -339,8 +427,29 @@ def fetch_completed_campaigns(sponsor_id=None):
     completed_campaigns = {}
     for campaign in campaigns:
         if campaign.id not in completed_campaigns.keys():
-            completed_campaigns[campaign.id] = {'title': campaign.title, 'description': campaign.description, 'goal': campaign.goal, 'budget': campaign.budget}
+            completed_campaigns[campaign.id] = {'title': campaign.title, 'description': campaign.description, 'goal': campaign.goal, 'budget': campaign.budget,
+                                                'start_date': campaign.start_date, 'end_date': campaign.end_date}
     return completed_campaigns
+
+'''fucntion for fetching all campaigns scheduled for future for sponsor_all_campaigns page'''
+def fetch_scheduled_campaigns(sponsor_id=None):
+    current_date = datetime.now().date()
+
+    if sponsor_id:
+        # Logic for finding out scheduled campaigns for a particular sponsor
+        campaigns = (db.session.query(Campaign)
+                .filter(Campaign.start_date > current_date, Campaign.sponsor_id==sponsor_id).all())
+    else:
+        # Logic for finding out all scheduled campaigns for admin page
+        campaigns = (db.session.query(Campaign)
+                .filter(Campaign.start_date > current_date).all())
+
+    scheduled_campaigns = {}
+    for campaign in campaigns:
+        if campaign.id not in scheduled_campaigns.keys():
+            scheduled_campaigns[campaign.id] = {'title': campaign.title, 'description': campaign.description, 'goal': campaign.goal, 'budget': campaign.budget,
+                                                'start_date': campaign.start_date, 'end_date': campaign.end_date}
+    return scheduled_campaigns
 
 '''function for retrieving pending ad requests for sponsor dashboard'''
 def fetch_pending_ad_requests_for_sponsor(id):
@@ -385,7 +494,7 @@ def fetch_campaign_details(camp_id):
     campaigns = (db.session.query(Campaign.id.label('campaign_id'), Campaign.title.label('campaign_title'), Campaign.description, Campaign.flagged,
                                 Campaign.start_date, Campaign.end_date, Campaign.visibility, Campaign.budget, Campaign.goal,
                                 Ad_Request.id.label('ad_id'), Ad_Request.title.label('ad_title'), Ad_Request.requirement,
-                                Ad_Request.payment_amount, Ad_Request.status,
+                                Ad_Request.payment_amount, Ad_Request.status, Ad_Request.influencer_id,
                                 Niche.name.label('niche_name'),
                                 Influencer.first_name, Influencer.last_name)
                                 .outerjoin(Ad_Request, Ad_Request.campaign_id==Campaign.id)
@@ -401,7 +510,7 @@ def fetch_campaign_details(camp_id):
         if campaign.ad_id not in campaign_info[campaign.campaign_id]['ads'].keys():
             campaign_info[campaign.campaign_id]['ads'][campaign.ad_id] = {'title': campaign.ad_title, 'requirements': campaign.requirement, 
                                                             'payment_amount': campaign.payment_amount, 'influencer_fname': campaign.first_name, 
-                                                            'influencer_lname': campaign.last_name, 'status': campaign.status, 'niche': campaign.niche_name}
+                                                            'influencer_lname': campaign.last_name, 'influencer_id':campaign.influencer_id, 'status': campaign.status, 'niche': campaign.niche_name}
 
     return campaign_info
         
@@ -446,7 +555,7 @@ def fetch_active_ads(influencer_id):
 '''function for retreiving pending ad_requests for influencer_dashboard'''
 def fetch_pending_ad_requests_for_influencer(influencer_id):
     current_date = datetime.now().date()
-    ads = (db.session.query(Ad_Request.id, Ad_Request.title.label('ad_title'), Ad_Request.payment_amount, Ad_Request.requirement,
+    ads = (db.session.query(Ad_Request.id, Ad_Request.title.label('ad_title'), Ad_Request.payment_amount, Ad_Request.requirement, Ad_Request.niche_id,
                             Campaign.title.label('campaign_title'), Campaign.description, Campaign.goal, Campaign.start_date, Campaign.end_date,
                             Sponsor.first_name, Sponsor.last_name, Sponsor.type, Niche.name.label('niche_name'))
                             .join(Campaign, Campaign.id==Ad_Request.campaign_id)
@@ -458,7 +567,7 @@ def fetch_pending_ad_requests_for_influencer(influencer_id):
         if ad.id not in pending_ads.keys():
             pending_ads[ad.id] = {'ad_title':ad.ad_title, 'payment_amount': ad.payment_amount, 'ad_requirement': ad.requirement, 
                                  'campaign_titile': ad.campaign_title, 'campaign_description': ad.description, 'sdate': ad.start_date, 'edate': ad.end_date,
-                                 'sponsor_fname': ad.first_name, 'sponsor_lname': ad.last_name, 'sponsor_type': ad.type, 'niche': ad.niche_name}
+                                 'sponsor_fname': ad.first_name, 'sponsor_lname': ad.last_name, 'sponsor_type': ad.type, 'niche': ad.niche_name, 'niche_id': ad.niche_id}
     return pending_ads
 
 '''function for retreiving the ad requests of all public campaigns and those private campaigns that have matching niche with influencer and are active'''

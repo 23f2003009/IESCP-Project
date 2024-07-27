@@ -100,7 +100,7 @@
                             <h5 class="text-center"><br>New Requests</h5>
 
                             {% if pending_ads %}
-                                {% for key, value in pending_ads %}
+                                {% for key, value in pending_ads.items() %}
                                 <div class="col-sm-4 mb-2">
                                     <div class="card">
                                         <div class="card-body">
@@ -108,7 +108,7 @@
                                             <p class="card-text">
                                                 Associated Campaign Title: {{ value.campaign_title }}
                                                 Requesting Sponsor: {{ value.sponsor_fname }}{{ value.sponsor_lname }}
-                                                Payment Amount: {{ value.payemnt_amount }} 
+                                                Payment Amount: {{ value.payment_amount }} 
                                             </p>
                                             <!-- VIEW NEW AD REQUEST MODAL TRIGGER BUTTON -->
                                             <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewNewAdRequestModal">View</button>
