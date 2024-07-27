@@ -68,6 +68,7 @@
                                     Goal: {{ value.goal }} <br>
                                     Budget: {{ value.budget }}
                                 </p>
+                                <a href="/campaign_details/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
                             </div>
                         </div>
                     </div>
@@ -92,8 +93,7 @@
                                     Goal: {{ value.goal }} <br>
                                     Budget: {{ value.budget }}
                                 </p>
-                                <a href="admin_campaign_details.html" class="btn btn-outline-primary btn-sm">View</a>
-                                <button type="button" class="btn btn-outline-danger btn-sm">Flag</button>
+                                <a href="/campaign_details/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
                             </div>
                         </div>
                     </div>
@@ -111,12 +111,28 @@
                     <div class="col-sm-4">
                         <div class="card">
                             <div class="card-body">
-                                <h6 class="card-title">ID: {{ key }} </h6>
-                                <p class="card-text">
-                                    Name: {{ value.fname }} {{ value.lname }} <br>
-                                    Username: {{ value.username }}<br>
-                                </p>
-                                <a href="/influencer_dashboard/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
+                                <h6 class="card-title">Influencer Name: {{ value.fname }} {{ value.lname }}</h6>
+                                <ul class="list-unstyled">
+                                    <li>Username: {{ value.username }} </li>
+                                    <li>Email: {{ vlaue.email }} </li>
+                                    <li>Earnings: {{ value.earning }} </li>
+                                    <li>Associated Accounts: </li>
+                                    {% for account, info in value.social_accounts.items() %}
+                                        <li>
+                                            {{ account }}:
+                                            <ul>
+                                                <li>Followers count: {{ info.followers }}</li>
+                                                <li>Profile Link: <a href="{{ info.profile_link }}" target="_blank">{{ info.profile_link }}</a></li>
+                                            </ul>
+                                        </li>
+                                    {% endfor %}
+                                    <li><strong>Niches of Influencer:</strong></li>
+                                    <ul>
+                                        {% for niche in value.niches %}
+                                            <li>{{ niche }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </ul>
                                 <button type="button" class="btn btn-outline-danger btn-sm">Flag</button>
                             </div>
                         </div>
@@ -138,16 +154,18 @@
                                 <h6 class="card-title">ID: {{ key }}</h6>
                                 <p class="card-text">
                                     Name: {{ value.fname }} {{ value.lname }} <br>
-                                    Username: {{ value.username }} <br>
+                                    Industry: {{ value.industry }} <br>
+                                    Budget: {{ value.budget }} <br>
+                                    Email: {{ value.email }} <br>
+                                    Type (Individual/Company): {{ value.type }}
                                 </p>
-                                <a href="/sponsor_dashboard/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
                                 <button type="button" class="btn btn-outline-danger btn-sm">Flag</button>
                             </div>
                         </div>
                     </div>
                 {% endfor %}
             {% else %}
-                <h4>No sponsosrs registered</h4>
+                <h4>No sponsors registered</h4>
             {% endif %}
         </div>
 

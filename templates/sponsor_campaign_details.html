@@ -161,7 +161,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <form id="editAdRequestForm" method="POST" action="/edit_ad/{{ sponsor_id }}/{{ key }}/{{ id }}">
+                                <form id="editAdRequestForm{{ key }}{{ id }}" method="POST" action="/edit_ad/{{ sponsor_id }}/{{ key }}/{{ id }}">
                                     <div class="mb-3">
                                         <label for="adTitle" class="form-label">Ad Request Title</label>
                                         <input type="text" class="form-control" id="adTitle" value="{{ details.title }}" name="adTitle" required>
@@ -206,7 +206,7 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <form id="deleteAdRequestForm" method="POST" action="/delete_ad/{{ sponsor_id }}/{{ key }}/{{ id }}">
+                                <form id="deleteAdRequestForm{{ key }}{{ id }}" method="POST" action="/delete_ad/{{ sponsor_id }}/{{ key }}/{{ id }}">
                                     <div class="mb-3">
                                         <label for="adTitle" class="form-label">Ad Request Title</label>
                                         <input type="text" class="form-control" id="adTitle" value="{{ details.title }}" name="adTitle" readonly>
@@ -225,11 +225,11 @@
                                     </div>
                                     <div class="mb-3">
                                         <label for="adPaymentAmount" class="form-label">PaymentAmount</label>
-                                        <input type="number" class="form-control" id="adPaymentAmount" name="adPaymentAmount" value="details.payment_amount" readonly>
+                                        <input type="number" class="form-control" id="adPaymentAmount" name="adPaymentAmount" value="{{ details.payment_amount }}" readonly>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-danger">Delte</button>
+                                        <button type="submit" class="btn btn-danger">Delete</button>
                                     </div>
                                 </form>
                             </div>

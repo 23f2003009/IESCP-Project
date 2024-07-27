@@ -31,37 +31,39 @@
         </div>
 
         <!-- CAMPAIGN DESCRIPTION -->
-        <div class="container row mt-4">
-            <h4>Campaign title</h4>
-            <p>
-                description: <br>
-                start date: <br>
-                end date: <br>
-                Visibility: <br>
-                budget: <br>
-            </p>
-        </div>
-
-        <!-- AD REQUEST CARDS -->
-        <div class="container row">
-            <h5 class="text-center mb-4">Ad Requests</h5>
-            <div class="col-sm-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title">Ad Request 01</h6>
-                        <p class="card-text">
-                            Title: <br>
-                            Requirements: <br>
-                            Payment Amount: <br>
-                            Influencer Assigned: <br>
-                            Status: <br>
-                            Niche:
-                        </p>
-                        <button type="button" class=" btn btn-outline-success btn-sm">Request</button>
-                    </div>
-                </div>
+        {% for key, value in campaign_info.items() %}
+            <div class="container row mt-4">
+                <h4>{{ value.title }}</h4>
+                <p>
+                    Description: {{ value.description }} <br>
+                    Goal: {{ value.goal }} <br>
+                    Timeline: {{ value.start_date }} - {{ value.end_date }} <br>
+                    Visibility: {{ value.visibility }} <br>
+                    Budget: {{ value.budget }} <br>
+                </p>
             </div>
-        </div>
+
+            <!-- AD REQUEST CARDS -->
+            <div class="container row">
+                <h5 class="text-center mb-4">Ad Requests</h5>
+                {% for id, details in value.ads.items() %}
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ details.title }}</h6>
+                                <p class="card-text">
+                                    Requirements: {{ details.requirements }} <br>
+                                    Payment Amount: {{ details.payment_amount }} <br>
+                                    Influencer Assigned: {{ details.influencer_fname }} {{ details.influencer_lname }} <br>
+                                    Status: {{ details.status }} <br>
+                                    Niche: {{ details.niche }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
 
     </div>
 </body>

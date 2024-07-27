@@ -43,6 +43,7 @@
                                 <h6 class="card-title">{{ value.title }}</h6>
                                 <p class="card-text">
                                     Description: {{ value.description }}<br>
+                                    Visibility: {{ value.visibility }} <br>
                                     Goal: {{ value.goal }} <br>
                                     Timeline: {{ value.start_date }} - {{ value.end_date }}
                                 </p>
@@ -73,10 +74,16 @@
                                 <h6 class="card-title">{{ value.title }}</h6>
                                 <p class="card-text">
                                     Description: {{ value.description }}<br>
+                                    Visibility: {{ value.visibility }} <br>
                                     Goal: {{ value.goal }} <br>
                                     Budget: {{ value.budget }} <br>
                                     Timeline: {{ value.start_date }} - {{ value.end_date }}
                                 </p>
+                                <!-- EDIT MODAL TRIGGER BUTTON -->
+                                <button type="button" class=" btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#editCampaignModal{{ key }}">Edit</button>
+                                <a href="/campaign_details/{{ sponsor_id }}/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
+                                <!-- DELETE MODAL TRIGGER BUTTON -->
+                                <button type="button" class=" btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCampaignModal{{ key }}">Delete</button>
                             </div>
                         </div>
                     </div>
@@ -99,6 +106,7 @@
                                 <h6 class="card-title">{{ value.title }}</h6>
                                 <p class="card-text">
                                     Description: {{ value.description }}<br>
+                                    Visibility: {{ value.visibility }} <br>
                                     Goal: {{ value.goal }} <br>
                                     Budget: {{ value.budget }} <br>
                                     Timeline: {{ value.start_date }} - {{ value.end_date }}
@@ -177,7 +185,7 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="editCampaignModalLabel">Edit Campaign</h5>
+                            <h5 class="modal-title" id="editCampaignModalLabel{{ key }}">Edit Campaign</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">

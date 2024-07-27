@@ -5,7 +5,7 @@ db = SQLAlchemy()
 class Sponsor(db.Model):
     __tablename__ = 'sponsor'
     id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String, nullable=False)
+    first_name = db.Column(db.String, nullable=False)         # if it is a company then the first_name denotes the name of the company
     last_name = db.Column(db.String)
     username = db.Column(db.String, unique=True, nullable=False)
     password = db.Column(db.String, nullable=False)
@@ -15,7 +15,7 @@ class Sponsor(db.Model):
     type = db.Column(db.Enum('company', 'individual'), nullable=False)
     # add functionality for inputting the name and details of company if associated with a company
     flagged = db.Column(db.Boolean, default=False)
-    campaign = db.relationship('Campaign', backref='sponsor')
+    campaign = db.relationship('Campaign', backref='sponsor', cascade='all, delete-orphan')
 
 class Influencer(db.Model):
     __tablename__ = 'influencer'
@@ -29,7 +29,7 @@ class Influencer(db.Model):
     earning = db.Column(db.Integer, default=0)
     profile_pic = db.Column(db.String)
     flagged = db.Column(db.Boolean, default=False)
-    reach = db.relationship('Reach', backref='influencer')
+    reach = db.relationship('Reach', backref='influencer', cascade='all, delete-orphan')
     ad_request = db.relationship('Ad_Request', backref='influencer')
     influencer_niche = db.relationship('Influencer_Niche', backref='influencer')
 
@@ -71,7 +71,7 @@ class Campaign(db.Model):
     end_date = db.Column(db.Date, nullable=False)
     budget = db.Column(db.Float, nullable=False)
     flagged = db.Column(db.Boolean, default=False)
-    ad_request = db.relationship('Ad_Request', backref='campaign')
+    ad_request = db.relationship('Ad_Request', backref='campaign', cascade='all, delete-orphan')
 
 class Ad_Request(db.Model):
     __tablename__ = 'ad_request'
@@ -79,7 +79,8 @@ class Ad_Request(db.Model):
     influencer_id = db.Column(db.Integer, db.ForeignKey('influencer.id'))
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'), nullable=False)
     title = db.Column(db.String, nullable=False)
-    status = db.Column(db.Enum('pending', 'accepted', 'rejected'), default='pending')
+    status = db.Column(db.Enum('pending', 'accepted', 'rejected', 'requested'))      
+    # when a sposnor gives an ad to influencer it will be 'pending' while if an influencer requests a sponsor for an ad then the status of that ad would be 'requested'
     payment_amount = db.Column(db.Float, nullable=False)
     requirement = db.Column(db.String, nullable=False)
     niche_id = db.Column(db.Integer, db.ForeignKey('niche.id'), nullable=False)
