@@ -19,9 +19,9 @@ def user_login():
         if sponsor:
             if not sponsor.flagged:
                 return render_template('sponsor_dashboard.html', first_name=sponsor.first_name, last_name=sponsor.last_name, 
-                                       sponsor_id=sponsor.id,
+                                       sponsor_id=sponsor.id, requested_ad_requests=fetch_requested_ad_requests_for_sponsor(sponsor.id),
                                        active_campaigns=fetch_active_campaigns(sponsor.id), 
-                                       pending_ad_requests=fetch_pending_ad_requests_for_sponsor(sponsor.id))
+                                       pending_ad_requests=fetch_pending_ad_requests_of_sponsor(sponsor.id))
             else:
                 return render_template('user_login', error='You have been flagged! Can\'t login.')
         
@@ -172,8 +172,39 @@ def sponsor_signup():
 def sponsor_dashboard(sponsor_id):
     sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
     return render_template('sponsor_dashboard.html', sponsor_id=sponsor_id, first_name=sponsor.first_name, last_name=sponsor.last_name,
-                           active_campaigns=fetch_active_campaigns(sponsor_id), 
-                           pending_ad_requests=fetch_pending_ad_requests_for_sponsor(sponsor_id))
+                           active_campaigns=fetch_active_campaigns(sponsor_id), requested_ad_requests=fetch_requested_ad_requests_for_sponsor(sponsor.id),
+                           pending_ad_requests=fetch_pending_ad_requests_of_sponsor(sponsor_id))
+
+
+# when an influencer requested for an ad, he already added his id in the influencer_id attribute of that ad. 
+# When the sponsor accepts the request, he just changes the status of the ad_request from 'requested' to 'accepted'
+@app.route('/sponsor_dashboard/accept_ad_request/<int:sponsor_id>/<int:ad_id>', methods=['GET', 'POST'])
+def sponsor_accept_ad_request(sponsor_id, ad_id):
+    ad_request = Ad_Request.query.filter_by(id=ad_id).first()
+    ad_request.status = 'accepted'
+    db.session.commit()
+
+    sponsor = Sponsor.query.filter_by(id=sponsor_id)
+    return render_template('sponsor_dashboard.html', sponsor_id=sponsor_id, first_name=sponsor.first_name, last_name=sponsor.last_name,
+                           active_campaigns=fetch_active_campaigns(sponsor_id), requested_ad_requests=fetch_requested_ad_requests_for_sponsor(sponsor.id),
+                           pending_ad_requests=fetch_pending_ad_requests_of_sponsor(sponsor_id))
+
+
+# when an influencer requested for an ad, he already added his id in the influencer_id attribute of that ad. 
+# When the sponsor rejects the request, he changes the status of the ad_request from 'requested' to None 
+# and removes that influencer's id from the influencer_id attribute of the ad
+@app.route('/sponsor_dashboard/reject_ad_request/<int:sponsor_id>/<int:ad_id>', methods=['GET', 'POST'])
+def sponsor_reject_ad_request(sponsor_id, ad_id):
+    ad_request = Ad_Request.query.filter_by(id=ad_id).first()
+    ad_request.status = None
+    ad_request.influencer_id = None
+    db.session.commit()
+
+    sponsor = Sponsor.query.filter_by(id=sponsor_id)
+    return render_template('sponsor_dashboard.html', sponsor_id=sponsor_id, first_name=sponsor.first_name, last_name=sponsor.last_name,
+                           active_campaigns=fetch_active_campaigns(sponsor_id), requested_ad_requests=fetch_requested_ad_requests_for_sponsor(sponsor.id),
+                           pending_ad_requests=fetch_pending_ad_requests_of_sponsor(sponsor_id))
+
 
 
 @app.route('/sponsor_find/<int:sponsor_id>', methods=['GET', 'POST'])
@@ -469,21 +500,38 @@ def fetch_scheduled_campaigns(sponsor_id=None):
                                                 'start_date': campaign.start_date, 'end_date': campaign.end_date, 'visibility': campaign.visibility}
     return scheduled_campaigns
 
-'''function for retrieving pending ad requests for sponsor dashboard'''
-def fetch_pending_ad_requests_for_sponsor(id):
-    ad_requests = (db.session.query(
-                   Ad_Request.id, Ad_Request.title.label('ad_title'),
-                   Campaign.title.label('campaign_title'),
-                   Influencer.first_name, Influencer.last_name)
-                   .join(Campaign, Ad_Request.campaign_id==Campaign.id)
-                   .join(Influencer, Ad_Request.influencer_id==Influencer.id)
-                   .filter(Campaign.sponsor_id==id, Ad_Request.status=='pending').all())
+'''function for retrieving pending ad requests for sponsor dashboard. These are those ad requests that the sponsor has send to a particular influencer
+and is waiting for the influencer to accept/reject'''
+def fetch_pending_ad_requests_of_sponsor(sponsor_id):
+    ad_requests = (db.session.query(Ad_Request.id, Ad_Request.title.label('ad_title'),
+                                    Campaign.title.label('campaign_title'),
+                                    Influencer.first_name, Influencer.last_name)
+                                    .join(Campaign, Ad_Request.campaign_id==Campaign.id)
+                                    .join(Influencer, Ad_Request.influencer_id==Influencer.id)
+                                    .filter(Campaign.sponsor_id==sponsor_id, Ad_Request.status=='pending').all())
     pending_ad_requests = {}
     for ad in ad_requests:
         if ad.id not in pending_ad_requests.keys():
             pending_ad_requests[ad.id] = {'ad_title':ad.ad_title, 'campaign_title':ad.campaign_title, 
                                           'influencer_fname': ad.first_name, 'influencer_lname': ad.last_name}
     return pending_ad_requests
+
+'''function for retrieving the requested ad requests for sponsor dashboard. These are those ad requests that an influencer has requested to
+a sponsor for and is waiting for conformation from the sponsors side.'''
+def fetch_requested_ad_requests_for_sponsor(sponsor_id):
+    ad_requests = (db.session.query(Ad_Request.id, Ad_Request.title.label('ad_title'), Ad_Request.influencer_id,
+                                    Campaign.title.label('campaign_title'),
+                                    Influencer.first_name, Influencer.last_name)
+                                    .join(Campaign, Campaign.id == Ad_Request.campaign_id)
+                                    .join(Influencer, Influencer.id == Ad_Request.influencer_id)
+                                    .filter(Campaign.sponsor_id == sponsor_id, Ad_Request.status == 'requested').all())
+    requested_ad_requests = {}
+    for ad in ad_requests:
+        if ad.id not in requested_ad_requests.keys():
+            requested_ad_requests[ad.id] = {'ad_title':ad.ad_title, 'campaign_title':ad.campaign_title, 'influencer_fname': ad.first_name, 'influencer_lname': ad.last_name,
+                                            'social_accounts': social_accounts(ad.influencer_id), 'niches': niches(ad.influencer_id)}
+    return requested_ad_requests
+
 
 '''function for retrieving all (unflagged) influencer details for sponsor find page'''
 def fetch_influencer_details_for_sponsor():
@@ -527,7 +575,7 @@ def fetch_campaign_details(camp_id):
 
     return campaign_info
         
-'''function for retrieving influencer details for influencer_dashboard'''
+'''function for retrieving influencer details of a particular influencer for his/her influencer_dashboard'''
 def fetch_influencer_details(influencer_id):
     influencer = Influencer.query.filter_by(id=influencer_id).first()
     influencer_info = {influencer.id: {}}

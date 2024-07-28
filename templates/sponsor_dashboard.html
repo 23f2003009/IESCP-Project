@@ -56,9 +56,57 @@
             {% endif %}
         </div>
 
-        <!-- NEW REQUESTS -->
+
+        <!-- NEW/REQUESTED AD REQUESTS -->
+        <!-- these are the requests that an influencer has requested for to the sponsor -->
         <div class="container row">
-            <h5 class="text-center"><br>New Requests</h5>
+            <h5 class="text-center"><br>New Ad Requests</h5>
+
+            {% if requested_ad_requests %}
+                {% for key, value in requested_ad_requests.items() %}
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title"> Ad Title: {{ value.ad_title }} </h6>
+                                <p class="card-text">
+                                    Associated Campaign Title: {{ value.campaign_title }}
+                                    Requesting Influencer: {{ value.influencer_fname }} {{ value.influencer_lname }} 
+                                    <ul class="list-unstyled">
+                                        <li>Associated Accounts:</li>
+                                        {% for account, info in value.social_accounts.items() %}
+                                            <li>
+                                                {{ account }}:
+                                                <ul>
+                                                    <li>Followers count: {{ info.followers }}</li>
+                                                    <li>Profile Link: <a href="{{ info.profile_link }}" target="_blank">{{ info.profile_link }}</a></li>
+                                                </ul>
+                                            </li>
+                                        {% endfor %}
+                                        <li>Niches of Influencer:</li>
+                                        <ul>
+                                            {% for niche in value.niches %}
+                                                <li>{{ niche }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </ul>
+                                </p>
+                                <!-- key here denotes the ad_id -->
+                                <a href="/sponsor_dashboard/accept_ad_request/{{ sponsor_id }}/{{ key }}" class="btn btn-outline-success btn-sm">Accept</a>
+                                <a href="/sponsor_dashboard/reject_ad_request/{{ sponsor_id }}/{{ key }}" class="btn btn-outline-danger btn-sm">Reject</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h5 class="text-secondary">No new requests for your ads</h5>
+            {% endif %}
+        </div>
+
+
+        <!-- PENDING AD REQUESTS -->
+        <!-- these are the requests that the sponsor has sent for to an influencer -->
+        <div class="container row">
+            <h5 class="text-center"><br>Pending Ad Requests</h5>
 
             {% if pending_ad_requests %}
                 {% for key, value in pending_ad_requests.items() %}
@@ -68,19 +116,17 @@
                                 <h6 class="card-title"> Ad Title: {{ value.ad_title }} </h6>
                                 <p class="card-text">
                                     Associated Campaign Title: {{ value.campaign_title }}
-                                    Requesting Influencer: {{ value.influencer_fname }}{{ value.influencer_lname }} 
+                                    Requested Influencer: {{ value.influencer_fname }} {{ value.influencer_lname }} 
                                 </p>
-                                <a href="#" class="btn btn-outline-primary btn-sm">View Influencer</a>
-                                <a href="#" class="btn btn-outline-success btn-sm">Accept</a>
-                                <a href="#" class="btn btn-outline-danger btn-sm">Reject</a>
                             </div>
                         </div>
                     </div>
                 {% endfor %}
             {% else %}
-                <h5 class="text-secondary">No pending requests for you</h5>
+                <h5 class="text-secondary">You have no pending requests</h5>
             {% endif %}
         </div>
+
     </div>
 </body>
 </html>
