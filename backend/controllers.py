@@ -23,7 +23,7 @@ def user_login():
                                        active_campaigns=fetch_active_campaigns(sponsor.id), 
                                        pending_ad_requests=fetch_pending_ad_requests_of_sponsor(sponsor.id))
             else:
-                return render_template('user_login', error='You have been flagged! Can\'t login.')
+                return render_template('user_login.html', error='You have been flagged! Can\'t login.')
         
         # checking if credentials match a influencer
         influencer = Influencer.query.filter_by(username=username, password=password).first()
@@ -58,6 +58,60 @@ def admin_login():
 
 @app.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
+    return render_template('admin_dashboard.html', active_campaigns=fetch_active_campaigns(), flagged_campaigns=fetch_flagged_campaigns(), 
+                           flagged_influencers=fetch_flagged_influencers(), flagged_sponsors=fetch_flagged_sponsors())
+
+
+@app.route('/flag_sponsor/<int:sponsor_id>', methods=['GET', 'POST'])
+def flag_sponsor(sponsor_id):
+    sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
+    sponsor.flagged = True
+    db.session.commit()
+    return render_template('admin_dashboard.html', active_campaigns=fetch_active_campaigns(), flagged_campaigns=fetch_flagged_campaigns(), 
+                           flagged_influencers=fetch_flagged_influencers(), flagged_sponsors=fetch_flagged_sponsors())
+
+
+@app.route('/unflag_sponsor/<int:sponsor_id>', methods=['GET', 'POST'])
+def unflag_sponsor(sponsor_id):
+    sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
+    sponsor.flagged = False
+    db.session.commit()
+    return render_template('admin_dashboard.html', active_campaigns=fetch_active_campaigns(), flagged_campaigns=fetch_flagged_campaigns(), 
+                           flagged_influencers=fetch_flagged_influencers(), flagged_sponsors=fetch_flagged_sponsors())
+
+
+@app.route('/flag_influencer/<int:influencer_id>', methods=['GET', 'POST'])
+def flag_influencer(influencer_id):
+    influencer = Influencer.query.filter_by(id=influencer_id).first()
+    influencer.flagged = True
+    db.session.commit()
+    return render_template('admin_dashboard.html', active_campaigns=fetch_active_campaigns(), flagged_campaigns=fetch_flagged_campaigns(), 
+                           flagged_influencers=fetch_flagged_influencers(), flagged_sponsors=fetch_flagged_sponsors())
+
+
+@app.route('/unflag_influencer/<int:influencer_id>', methods=['GET', 'POST'])
+def unflag_influencer(influencer_id):
+    influencer = Influencer.query.filter_by(id=influencer_id).first()
+    influencer.flagged = False
+    db.session.commit()
+    return render_template('admin_dashboard.html', active_campaigns=fetch_active_campaigns(), flagged_campaigns=fetch_flagged_campaigns(), 
+                           flagged_influencers=fetch_flagged_influencers(), flagged_sponsors=fetch_flagged_sponsors())
+
+
+@app.route('/flag_campaign/<int:campaign_id>', methods=['GET', 'POST'])
+def flag_campaign(campaign_id):
+    campaign = Campaign.query.filter_by(id=campaign_id).first()
+    campaign.flagged = True
+    db.session.commit()
+    return render_template('admin_dashboard.html', active_campaigns=fetch_active_campaigns(), flagged_campaigns=fetch_flagged_campaigns(), 
+                           flagged_influencers=fetch_flagged_influencers(), flagged_sponsors=fetch_flagged_sponsors())
+
+
+@app.route('/unflag_campaign/<int:campaign_id>', methods=['GET', 'POST'])
+def unflag_campaign(campaign_id):
+    campaign = Campaign.query.filter_by(id=campaign_id).first()
+    campaign.flagged = False
+    db.session.commit()
     return render_template('admin_dashboard.html', active_campaigns=fetch_active_campaigns(), flagged_campaigns=fetch_flagged_campaigns(), 
                            flagged_influencers=fetch_flagged_influencers(), flagged_sponsors=fetch_flagged_sponsors())
 
@@ -436,6 +490,14 @@ def delete_ad_request(sponsor_id, camp_id, ad_id):
 
 
 
+'''function to calculate the progress of a camp/ad based on the start and end date'''
+def progress(start_date, end_date):
+    current_date = datetime.now().date()
+    total_duration = (end_date - start_date).days
+    elapsed_duration = (current_date - start_date).days
+    progress = (elapsed_duration / total_duration) * 100
+
+    return int(min(max(progress, 0), 100))
 
 
 '''function for retrieving all (unflagged) active campaigns for sposnor_all_campaigns and admin_find page'''
@@ -458,7 +520,7 @@ def fetch_active_campaigns(sponsor_id=None):
         if campaign.id not in active_campaigns.keys():
             active_campaigns[campaign.id] = {'title': campaign.title, 'description': campaign.description,'goal': campaign.goal,
                                             'start_date': campaign.start_date, 'end_date': campaign.end_date, 'budget': campaign.budget,
-                                            'visibility': campaign.visibility}
+                                            'visibility': campaign.visibility, 'progress':progress(campaign.start_date, campaign.end_date)}
     return active_campaigns
 
 '''function for retrieving all flagged campaigns for admin dashboard'''
@@ -467,7 +529,8 @@ def fetch_flagged_campaigns():
     flagged_campaigns = {}
     for campaign in campaigns:
         if campaign.id not in flagged_campaigns.keys():
-            flagged_campaigns[campaign.id] = {'title': campaign.title, 'description': campaign.description}
+            flagged_campaigns[campaign.id] = {'title': campaign.title, 'description': campaign.description, 'goal': campaign.goal, 
+                                              'start_date':campaign.start_date, 'end_date': campaign.end_date}
     return flagged_campaigns
 
 '''function for retrieving all flagged influencers for admin dashboard'''
@@ -476,7 +539,8 @@ def fetch_flagged_influencers():
     flagged_influencers = {}
     for influencer in influencers:
         if influencer.id not in flagged_influencers.keys():
-            flagged_influencers[influencer.id] = {'fname': influencer.first_name, 'lname': influencer.last_name, 'username': influencer.username}
+            flagged_influencers[influencer.id] = {'fname': influencer.first_name, 'lname': influencer.last_name, 'username': influencer.username,
+                                                  'social_accounts': social_accounts(influencer.id), 'niches': Niche(influencer.id)}
     return flagged_influencers
 
 '''function for retrieving all flagged sponsors for admin dashboard'''
@@ -485,7 +549,8 @@ def fetch_flagged_sponsors():
     flagged_sponsors = {}
     for sponsor in sponsors:
         if sponsor.id not in flagged_sponsors.keys():
-            flagged_sponsors[sponsor.id] = {'fname': sponsor.first_name, 'lname': sponsor.last_name, 'username': sponsor.username}
+            flagged_sponsors[sponsor.id] = {'fname': sponsor.first_name, 'lname': sponsor.last_name, 'username': sponsor.username, 'industry': sponsor.industry,
+                                            'budget': sponsor.budget, 'type': sponsor.type, 'email': sponsor.email}
     return flagged_sponsors
 
 '''function for retrieving all (unflagged) influencers' data for admin find page'''
@@ -653,6 +718,7 @@ def niches(influencer_id):
         niches.append(tuple.niche_name)
     return niches
 
+
 '''function for retrieving active ad_requests' details for influencer_dashboard. Active ad requests for an influencer are those whose influencer_id 
 matches, whose campaign's timeline is going on, campaign isn't flagged and the request status is accepted.'''
 def fetch_active_ads(influencer_id):
@@ -670,7 +736,8 @@ def fetch_active_ads(influencer_id):
         if ad.id not in active_ads.keys():
             active_ads[ad.id] = {'ad_title':ad.ad_title, 'payment_amount': ad.payment_amount, 'ad_requirement': ad.requirement, 
                                  'campaign_title': ad.campaign_title, 'campaign_description': ad.description, 'sdate': ad.start_date, 'edate': ad.end_date,
-                                 'sponsor_fname': ad.first_name, 'sponsor_lname': ad.last_name, 'sponsor_type': ad.type, 'niche': ad.niche_name}
+                                 'sponsor_fname': ad.first_name, 'sponsor_lname': ad.last_name, 'sponsor_type': ad.type, 'niche': ad.niche_name, 
+                                 'progress': progress(ad.start_date, ad.end_date)}
     return active_ads
 
 '''function for retreiving pending ad_requests for influencer_dashboard. Pending ads for an influencer are those that have the same influencer_id,
@@ -711,7 +778,7 @@ def fetch_requested_ad_requests_of_influencer(influencer_id):
 
 '''function for retreiving the ad requests of all public and unflagged campaigns for influencer_find page'''
 def fetch_all_ads():
-    ad_requests = (db.session.query(Ad_Request.id, Ad_Request.title.label('ad_title'), Ad_Request.payment_amount, Ad_Request.requirement,
+    ad_requests = (db.session.query(Ad_Request.id, Ad_Request.title.label('ad_title'), Ad_Request.payment_amount, Ad_Request.requirement, Ad_Request.influencer_id,
                             Campaign.title.label('campaign_title'), Campaign.description, Campaign.goal, Campaign.start_date, Campaign.end_date,
                             Sponsor.first_name, Sponsor.last_name, Sponsor.type, Niche.name.label('niche_name'))
                             .join(Campaign, Campaign.id==Ad_Request.campaign_id)
@@ -723,7 +790,7 @@ def fetch_all_ads():
         if ad.id not in all_ads.keys():
             all_ads[ad.id] = {'ad_title':ad.ad_title, 'payment_amount': ad.payment_amount, 'ad_requirement': ad.requirement, 
                                  'campaign_title': ad.campaign_title, 'campaign_description': ad.description, 'sdate': ad.start_date, 'edate': ad.end_date,
-                                 'sponsor_fname': ad.first_name, 'sponsor_lname': ad.last_name, 'sponsor_type': ad.type, 'niche': ad.niche_name}
+                                 'sponsor_fname': ad.first_name, 'sponsor_lname': ad.last_name, 'sponsor_type': ad.type, 'niche': ad.niche_name, 'assigned_influencer':ad.influencer_id}
     return all_ads
 
 

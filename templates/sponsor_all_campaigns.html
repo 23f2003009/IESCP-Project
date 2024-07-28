@@ -41,15 +41,19 @@
                         <div class="card">
                             <div class="card-body">
                                 <h6 class="card-title">{{ value.title }}</h6>
-                                <p class="card-text">
-                                    Description: {{ value.description }}<br>
-                                    Visibility: {{ value.visibility }} <br>
-                                    Goal: {{ value.goal }} <br>
-                                    Timeline: {{ value.start_date }} - {{ value.end_date }}
-                                </p>
+                                <ul class="card-text">
+                                    <li><u>Description</u>: {{ value.description }}</li>
+                                    <li><u>Visibility</u>: {{ value.visibility }}</li>
+                                    <li><u>Goal</u>: {{ value.goal }}</li>
+                                    <li><u>Timeline</u>: {{ value.start_date }} - {{ value.end_date }}</li>
+                                </ul>
+                                <i>Campaign progress</i>:
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ value.progress }}%" aria-valuenow="{{ value.progress }}" aria-valuemin="0" aria-valuemax="100">{{ value.progress }}%</div>
+                                </div> <br>
+                                <a href="/campaign_details/{{ sponsor_id }}/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
                                 <!-- EDIT MODAL TRIGGER BUTTON -->
                                 <button type="button" class=" btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#editCampaignModal{{ key }}">Edit</button>
-                                <a href="/campaign_details/{{ sponsor_id }}/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
                                 <!-- DELETE MODAL TRIGGER BUTTON -->
                                 <button type="button" class=" btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCampaignModal{{ key }}">Delete</button>
                             </div>
@@ -57,7 +61,7 @@
                     </div>
                 {% endfor %}
             {% else %}
-                <h5 class="text-secondary">You have no active campaigns</h5>
+                <h6 class="text-secondary">You have no active campaigns</h6>
             {% endif %}
         </div>
 
@@ -72,16 +76,16 @@
                         <div class="card">
                             <div class="card-body">
                                 <h6 class="card-title">{{ value.title }}</h6>
-                                <p class="card-text">
-                                    Description: {{ value.description }}<br>
-                                    Visibility: {{ value.visibility }} <br>
-                                    Goal: {{ value.goal }} <br>
-                                    Budget: {{ value.budget }} <br>
-                                    Timeline: {{ value.start_date }} - {{ value.end_date }}
-                                </p>
+                                <ul class="card-text">
+                                    <li><u>Description</u>: {{ value.description }}</li>
+                                    <li><u>Visibility</u>: {{ value.visibility }}</li>
+                                    <li><u>Goal</u>: {{ value.goal }}</li>
+                                    <li><u>Timeline</u>: {{ value.start_date }} - {{ value.end_date }}</li>
+                                    <li><u>Budget</u>: {{ value.budget }} </li>
+                                </ul>
+                                <a href="/campaign_details/{{ sponsor_id }}/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
                                 <!-- EDIT MODAL TRIGGER BUTTON -->
                                 <button type="button" class=" btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#editCampaignModal{{ key }}">Edit</button>
-                                <a href="/campaign_details/{{ sponsor_id }}/{{ key }}" class="btn btn-outline-primary btn-sm">View</a>
                                 <!-- DELETE MODAL TRIGGER BUTTON -->
                                 <button type="button" class=" btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteCampaignModal{{ key }}">Delete</button>
                             </div>
@@ -89,7 +93,7 @@
                     </div>
                 {% endfor %}
             {% else %}
-                <h5 class="text-secondary">No campaigns scheduled.</h5>
+                <h6 class="text-secondary">No campaigns scheduled.</h6>
             {% endif %}
         </div>
 
@@ -104,19 +108,19 @@
                         <div class="card">
                             <div class="card-body">
                                 <h6 class="card-title">{{ value.title }}</h6>
-                                <p class="card-text">
-                                    Description: {{ value.description }}<br>
-                                    Visibility: {{ value.visibility }} <br>
-                                    Goal: {{ value.goal }} <br>
-                                    Budget: {{ value.budget }} <br>
-                                    Timeline: {{ value.start_date }} - {{ value.end_date }}
-                                </p>
+                                <ul class="card-text">
+                                    <li><u>Description</u>: {{ value.description }}</li>
+                                    <li><u>Visibility</u>: {{ value.visibility }}</li>
+                                    <li><u>Goal</u>: {{ value.goal }}</li>
+                                    <li><u>Timeline</u>: {{ value.start_date }} - {{ value.end_date }}</li>
+                                    <li><u>Budget</u>: {{ value.budget }} </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
                 {% endfor %}
             {% else %}
-                <h5 class="text-secondary">No campaigns completed yet</h5>
+                <h6 class="text-secondary">No campaigns completed yet</h6>
             {% endif %}
 
             <!-- ADD CAMPAIGN MODAL TRIGGER BUTTON -->

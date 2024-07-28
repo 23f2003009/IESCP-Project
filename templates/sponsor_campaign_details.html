@@ -40,13 +40,13 @@
             {% else %}
                 <div class="container row mt-4">
                     <h4>{{ value.title }}</h4>
-                    <p>
-                        Description: {{ value.description }} <br>
-                        Goal: {{ value.goal }} <br>
-                        Timeline: {{ value.start_date }} - {{ value.end_date }} <br>
-                        Visibility: {{ value.visibility }} <br>
-                        Budget: {{ value.budget }} <br>
-                    </p>
+                    <ul>
+                        <li><u>Description</u>: {{ value.description }}</li>
+                        <li><u>Visibility</u>: {{ value.visibility }}</li>
+                        <li><u>Goal</u>: {{ value.goal }}</li>
+                        <li><u>Timeline</u>: {{ value.start_date }} - {{ value.end_date }}</li>
+                        <li><u>Budget</u>: {{ value.budget }} </li>
+                    </ul>
                 </div>
 
                 <!-- AD REQUEST CARDS -->
@@ -58,16 +58,16 @@
                                 <div class="card">
                                     <div class="card-body">
                                         <h6 class="card-title">{{ details.title }}</h6>
-                                        <p class="card-text">
-                                            Requirements: {{ details.requirements }} <br>
-                                            Payment Amount: {{ details.payment_amount }} <br>
-                                            Influencer Assigned: {{ details.influencer_fname }} {{ details.influencer_lname }} <br>
-                                            Status: {{ details.status }} <br>
-                                            Niche: {{ details.niche }} <br>
+                                        <ul class="card-text">
+                                            <li><u>Requirements</u>: {{ details.requirements }} </li>
+                                            <li><u>Payment Amount</u>: {{ details.payment_amount }}</li>
+                                            <li><u>Influencer Assigned</u>: {{ details.influencer_fname }} {{ details.influencer_lname }}</li>
+                                            <li><u>Status</u>: {{ details.status }}</li>
+                                            <li><u>Niche</u>: {{ details.niche }}</li>
                                             {% if not details.influencer_id %}
                                                 <a href="/find_influencer_for_ad/{{ sponsor_id }}/{{ key }}/{{ id }}" class="btn btn-warning btn-sm">Find Influencer</a>      <!-- key here is the camp_id and id is the ad_id-->
                                             {% endif %}
-                                        </p>
+                                        </ul>
                                         <!-- EDIT MODAL TRIGGER BUTTON -->
                                         <button type="button" class=" btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#editAdRequestModal{{ key}}{{ id }}">Edit</button>
                                         <button type="button" class=" btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteAdRequestModal{{ key }}{{ id }}">Delete</button>

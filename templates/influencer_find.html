@@ -43,7 +43,11 @@
                                     <li><u>Niche</u>: {{ value.niche }}</li> <br>
                                     <!-- VIEW AD REQUEST MODAL TRIGGER BUTTON -->
                                     <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewAdRequestModal{{ key }}">View</button>
-                                    <a href="/request_sponsor_for_ad/{{ influencer_id }}/{{ key }}" class="btn btn-outline-success btn-sm">Request</a>    <!-- here key denotes camp_id-->
+                                    {% if value.assigned_influencer %}
+                                        <button class="btn btn-secondary btn-sm"><i>Already assigned to an influencer</i></button>
+                                    {% else %}
+                                        <a href="/request_sponsor_for_ad/{{ influencer_id }}/{{ key }}" class="btn btn-outline-success btn-sm">Request</a>    <!-- here key denotes camp_id-->
+                                    {% endif %}
                                 </ul>
                             </div>
                         </div>

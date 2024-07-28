@@ -60,7 +60,11 @@
                                             <li><u>Niche</u>: {{ details.niche }}</li>
                                     </ul>
                                     <!-- here id denotes the ad_id  -->
-                                    <a href="/request_sponsor_for_ad/{{ influencer_id }}/{{ id }}" class="btn btn-outline-success btn-sm">Request</a>
+                                    {% if details.influencer_id %}
+                                        <button class="btn btn-secondary btn-sm"><i>Already assigned to an influencer</i></button>
+                                    {% else %}
+                                        <a href="/request_sponsor_for_ad/{{ influencer_id }}/{{ key }}" class="btn btn-outline-success btn-sm">Request</a>    <!-- here key denotes camp_id-->
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
