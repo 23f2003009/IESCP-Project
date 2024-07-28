@@ -106,6 +106,7 @@
 
                     <div class="row">
                         <!-- NEW REQUESTS -->
+                        <!-- These are the 'pending' requests that have been given to this influencer by a sponsor and are yet to accepted/rejected-->
                         <div class="row">
                             <h5 class="text-center"><br>New Requests</h5>
 
@@ -123,8 +124,9 @@
                                                 </p>
                                                 <!-- VIEW NEW AD REQUEST MODAL TRIGGER BUTTON -->
                                                 <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewNewAdRequestModal{{ key }}">View</button>
-                                                <button type="button" class="btn btn-outline-success btn-sm">Accept</button>
-                                                <button type="button" class="btn btn-outline-danger btn-sm">Reject</button>
+                                                <!-- key here denotes the ad_id -->
+                                                <a href="/influencer_dashboard/accept_ad_request/{{ influencer_id }}/{{ key }}" class="btn btn-outline-success btn-sm">Accept</a>
+                                                <a href="/influencer_dashboard/reject_ad_request/{{ influencer_id }}/{{ key }}" class="btn btn-outline-danger btn-sm">Reject</a>
                                             </div>
                                         </div>
                                     </div>
@@ -136,6 +138,37 @@
 
                         </div>
                     </div>
+
+                    <div class="row">
+                        <!-- REQUESTED REQUESTS -->
+                        <!-- These are the 'requested' requests that the influencer has requested for and are yet to accepted/rejected by the sponsor -->
+                        <div class="row">
+                            <h5 class="text-center"><br>Requested Ads</h5>
+
+                            {% if requested_ads %}
+                                {% for key, value in requested_ads.items() %}
+                                    <div class="col-sm-6 mb-2">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title">Ad Title: {{ value.ad_title }} </h6>
+                                                <p class="card-text">
+                                                    Associated Campaign Title: {{ value.campaign_title }} <br>
+                                                    Requesting Sponsor: {{ value.sponsor_fname }}{{ value.sponsor_lname }} <br>
+                                                    Payment Amount: {{ value.payment_amount }} <br>
+                                                    Timeline: {{ value.sdate }} - {{ value.edate }} <br>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            
+                            {% else %}
+                                <h5 class="text-secondary text-center">You have not requested for any ads.</h5>
+                            {% endif %}
+
+                        </div>
+                    </div>
+
                 </div>
 
 

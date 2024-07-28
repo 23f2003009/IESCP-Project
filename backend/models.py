@@ -64,6 +64,7 @@ class Campaign(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sponsor_id = db.Column(db.Integer, db.ForeignKey('sponsor.id'), nullable=False)
     visibility = db.Column(db.Enum('private', 'public'), default='public', nullable=False)
+    # private campaigns are those campigns that an influencer can not see. Only the host sponsor can send req for ads of such campaigns
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String)
     goal = db.Column(db.String)

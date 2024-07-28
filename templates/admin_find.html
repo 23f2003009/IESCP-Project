@@ -111,10 +111,10 @@
                     <div class="col-sm-4">
                         <div class="card">
                             <div class="card-body">
-                                <h6 class="card-title">Influencer Name: {{ value.fname }} {{ value.lname }}</h6>
+                                <h6 class="card-title">{{ value.fname }} {{ value.lname }}</h6>
                                 <ul class="list-unstyled">
                                     <li>Username: {{ value.username }} </li>
-                                    <li>Email: {{ vlaue.email }} </li>
+                                    <li>Email: {{ value.email }} </li>
                                     <li>Earnings: {{ value.earning }} </li>
                                     <li>Associated Accounts: </li>
                                     {% for account, info in value.social_accounts.items() %}
@@ -126,7 +126,7 @@
                                             </ul>
                                         </li>
                                     {% endfor %}
-                                    <li><strong>Niches of Influencer:</strong></li>
+                                    <li>Niches of Influencer:</li>
                                     <ul>
                                         {% for niche in value.niches %}
                                             <li>{{ niche }}</li>
@@ -151,14 +151,13 @@
                     <div class="col-sm-4">
                         <div class="card">
                             <div class="card-body">
-                                <h6 class="card-title">ID: {{ key }}</h6>
-                                <p class="card-text">
-                                    Name: {{ value.fname }} {{ value.lname }} <br>
-                                    Industry: {{ value.industry }} <br>
-                                    Budget: {{ value.budget }} <br>
-                                    Email: {{ value.email }} <br>
-                                    Type (Individual/Company): {{ value.type }}
-                                </p>
+                                <h6 class="card-title">{{ value.fname }} {{ value.lname }}</h6>
+                                <ul class="card-text">
+                                    <li>Industry: {{ value.industry }}</li>
+                                    <li>Budget: {{ value.budget }}</li>
+                                    <li>Email: {{ value.email }}</li>
+                                    <li>Type (Individual/Company): {{ value.type }}</li>
+                                </ul>
                                 <button type="button" class="btn btn-outline-danger btn-sm">Flag</button>
                             </div>
                         </div>

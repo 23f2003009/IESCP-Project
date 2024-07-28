@@ -32,60 +32,79 @@
 
         <div class="container row">
             <h5 class="text-center my-4">All Ads</h5>
-            <div class="col-sm-3">
-                <div class="card">
-                    <div class="card-body">
-                        <p>
-                            Ad Title: <br>
-                            Payment Amount: <br>
-                            Niche: <br><br>
-                            <!-- VIEW AD REQUEST MODAL TRIGGER BUTTON -->
-                            <a href="#" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewAdRequestModal">View</a>
-                            <button type="submit" class="btn btn-outline-success btn-sm">Request</button>
-                        </p>
+            {% if all_ads %}
+                {% for key, value in all_ads.items() %}
+                    <div class="col-sm-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ value.ad_title }}</h6>
+                                <ul>
+                                    <li><u>Payment Amount</u>: {{ value.payment_amount }}</li>
+                                    <li><u>Niche</u>: {{ value.niche }}</li> <br>
+                                    <!-- VIEW AD REQUEST MODAL TRIGGER BUTTON -->
+                                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#viewAdRequestModal{{ key }}">View</button>
+                                    <a href="/request_sponsor_for_ad/{{ influencer_id }}/{{ key }}" class="btn btn-outline-success btn-sm">Request</a>    <!-- here key denotes camp_id-->
+                                </ul>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+                {% endfor %}
+            {% else %}
+                    <h6 class="text-secondary">No ads created yet</h6>
+            {% endif %}
         </div>
+
 
         <div class="container row">
-            <h5 class="text-center my-4">All Public Campaigns</h5>
-            <div class="col-sm-3">
-                <div class="card">
-                    <div class="card-body">
-                        <p>
-                            Campaign Title: <br>
-                            Campaign desc: <br><br>
-                            <a href="/templates/influencer_campaign_details.html" class="btn btn-outline-primary btn-sm">View Campaign Details</a>
-                        </p>
+            <h5 class="text-center my-4">All Public Active Campaigns</h5>
+            {% if all_public_campaigns %}
+                {% for key, value in all_public_campaigns.items() %}
+                    <div class="col-sm-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ value.title }}</h6>
+                                <ul>
+                                    <li><u>Description</u>: {{ value.description }}</li>
+                                    <li><u>Goal</u>: {{ value.goal }}</li>
+                                    <li><u>Timeline</u>: {{ value.sdate }} - {{ value.edate }}</li>
+                                    <li><u>Budget</u>: {{ value.budget }}</li> <br>
+                                    <!-- key here denotes the campaign id -->
+                                    <a href="/campaign_details_for_influencer/{{ influencer_id }}/{{ key }}" class="btn btn-outline-primary btn-sm">View Campaign Details</a>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
+                {% endfor %}
+            {% else %}
+                    <h6 class="text-secondary">No public campaigns available</h6>
+            {% endif %}
         </div>
 
-        <!-- VIEW AD REQUEST MODAL -->
-        <!-- In every field, add the original values from database -->
-        <div class="modal fade" id="viewAdRequestModal" tabindex="-1" aria-labelledby="viewAdRequestModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="viewAdRequestModalLabel">Ad Request</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            Ad Title: <br>
-                            campaign title: <br>
-                            sponsor company/individual: <br>
-                            Niche: <br>
-                            Requirement: <br>
-                            start - end date: <br>
-                            Payment Amount:
+        {% for key, value in all_ads.items() %}
+            <!-- VIEW AD REQUEST MODAL -->
+            <div class="modal fade" id="viewAdRequestModal{{ key }}" tabindex="-1" aria-labelledby="viewAdRequestModalLabel{{ key }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="viewAdRequestModalLabel{{ key }}">Ad Request</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <li><u>Ad Title</u>: {{ value.ad_title }}</li> 
+                                <li><u>Campaign Title</u>: {{ value.campaign_title }}</li>
+                                <li><u>Sponsor (company/individual)</u>: {{ value.sponsor_type }} </li>
+                                <li><u>Sponsor Name</u>: {{ value.sponsor_fname }} {{ value.sponsor_lname }}</li>
+                                <li><u>Niche</u>: {{ value.niche }}</li>
+                                <li><u>Requirement</u>: {{ value.ad_requirement }}</li> 
+                                <li><u>Timeline</u>: {{ value.sdate }} - {{ value.edate }}</li>
+                                <li><u>Payment Amount</u>: {{ value.payment_amount }}</li>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        {% endfor %}
 
     </div>
 </body>

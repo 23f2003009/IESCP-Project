@@ -34,33 +34,39 @@
         {% for key, value in campaign_info.items() %}
             <div class="container row mt-4">
                 <h4>{{ value.title }}</h4>
-                <p>
-                    Description: {{ value.description }} <br>
-                    Goal: {{ value.goal }} <br>
-                    Timeline: {{ value.start_date }} - {{ value.end_date }} <br>
-                    Visibility: {{ value.visibility }} <br>
-                    Budget: {{ value.budget }} <br>
-                </p>
+                <ul>
+                    <li><u>Description</u>: {{ value.description }}</li>
+                    <li><u>Goal</u>: {{ value.goal }}</li>
+                    <li><u>Timeline</u>: {{ value.start_date }} - {{ value.end_date }}</li>
+                    <li><u>Visibility</u>: {{ value.visibility }}</li>
+                    <li><u>Budget</u>: {{ value.budget }}</li>
+                </ul>
             </div>
 
             <!-- AD REQUEST CARDS -->
             <div class="container row">
                 <h5 class="text-center mb-4">Ad Requests</h5>
                 {% for id, details in value.ads.items() %}
-                    <div class="col-sm-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <h6 class="card-title">{{ details.title }}</h6>
-                                <p class="card-text">
-                                    Requirements: {{ details.requirements }} <br>
-                                    Payment Amount: {{ details.payment_amount }} <br>
-                                    Influencer Assigned: {{ details.influencer_fname }} {{ details.influencer_lname }} <br>
-                                    Status: {{ details.status }} <br>
-                                    Niche: {{ details.niche }}
-                                </p>
+                    {% if id %}
+                        <div class="col-sm-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ details.title }}</h6>
+                                    <ul class="card-text">
+                                        <li><u>Requirements</u>: {{ details.requirements }}</li>
+                                            <li><u>Payment Amount</u>: {{ details.payment_amount}}</li> 
+                                            <li><u>Influencer Assigned</u>: {{ details.influencer_fname }} {{ details.influencer_lname }}</li>
+                                            <li><u>Status</u>: {{ details.status }}</li>
+                                            <li><u>Niche</u>: {{ details.niche }}</li>
+                                    </ul>
+                                    <!-- here id denotes the ad_id  -->
+                                    <a href="/request_sponsor_for_ad/{{ influencer_id }}/{{ id }}" class="btn btn-outline-success btn-sm">Request</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {% else %}
+                        <h6 class="text-secondary">This campaign has no ads</h6>
+                    {% endif %}
                 {% endfor %}
             </div>
         {% endfor %}
