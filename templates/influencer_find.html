@@ -17,19 +17,28 @@
                 <div class="container-fluid">
                     <label class="navbar-brand">{{ fname }} {{ lname }}'s Dashboard</label>
                     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                        <div class="navbar-nav">
-                            <a class="nav-link" href="/influencer_dashboard/{{ influencer_id }}">Profile</a>
-                            <a class="nav-link active" href="/influencer_find/{{ influencer_id }}">Find</a>
-                            <a class="nav-link" href="#">Statistics</a>
-                            <a class="nav-link" href="#">Logout</a>
-                            <input class="form-control" type="search" placeholder="Search by Campaign/Ad Title" aria-label="Search">
-                            <button type="submit" class="btn btn-success btn-sm">Search</button>
-                        </div>
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item"><a class="nav-link" href="/influencer_dashboard/{{ influencer_id }}">Profile</a></li>
+                            <li class="nav-item"><a class="nav-link active" href="/influencer_find/{{ influencer_id }}">Find</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#">Statistics</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#">Logout</a></li>
+                        </ul>
+                        <form class="d-flex" method="GET" action="/influencer_find/{{ influencer_id }}">
+                            <select class="form-control" name="niche_id">
+                                <option value="" disabled selected>Select niche to filter on</option>
+                                {% for niche in niches %}
+                                    <option value="{{ niche.id }}">{{ niche.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button class="btn btn-outline-warning" type="submit">Filter</button>
+                        </form>
                     </div>
                 </div>
             </nav>
         </div>
 
+
+        <!-- ALL ADS -->
         <div class="container row">
             <h5 class="text-center my-4">All Ads</h5>
             {% if all_ads %}
@@ -54,11 +63,12 @@
                     </div>
                 {% endfor %}
             {% else %}
-                    <h6 class="text-secondary">No ads created yet</h6>
+                    <h6 class="text-secondary">Nothing available to show</h6>
             {% endif %}
         </div>
 
 
+        <!-- ALL PUBLIC ACTIVE CAMAPIGNS -->
         <div class="container row">
             <h5 class="text-center my-4">All Public Active Campaigns</h5>
             {% if all_public_campaigns %}
@@ -80,7 +90,7 @@
                     </div>
                 {% endfor %}
             {% else %}
-                    <h6 class="text-secondary">No public campaigns available</h6>
+                    <h6 class="text-secondary">Nothing available to show</h6>
             {% endif %}
         </div>
 

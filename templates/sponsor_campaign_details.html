@@ -23,8 +23,6 @@
                             <a class="nav-link" href="/sponsor_find/{{ sponsor_id }}">Find</a>
                             <a class="nav-link" href="#">Statistics</a>
                             <a class="nav-link" href="#">Logout</a>
-                            <input class="form-control" type="search" placeholder="Search ad title" aria-label="Search">
-                            <button type="submit" class="btn btn-success btn-sm">Search</button>
                         </div>
                     </div>
                 </div>
@@ -64,13 +62,13 @@
                                             <li><u>Influencer Assigned</u>: {{ details.influencer_fname }} {{ details.influencer_lname }}</li>
                                             <li><u>Status</u>: {{ details.status }}</li>
                                             <li><u>Niche</u>: {{ details.niche }}</li>
-                                            {% if not details.influencer_id %}
-                                                <a href="/find_influencer_for_ad/{{ sponsor_id }}/{{ key }}/{{ id }}" class="btn btn-warning btn-sm">Find Influencer</a>      <!-- key here is the camp_id and id is the ad_id-->
-                                            {% endif %}
                                         </ul>
                                         <!-- EDIT MODAL TRIGGER BUTTON -->
                                         <button type="button" class=" btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#editAdRequestModal{{ key}}{{ id }}">Edit</button>
                                         <button type="button" class=" btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteAdRequestModal{{ key }}{{ id }}">Delete</button>
+                                        {% if not details.influencer_id %}
+                                            <a href="/find_influencer_for_ad/{{ sponsor_id }}/{{ key }}/{{ id }}" class="btn btn-warning btn-sm">Find Influencer</a>      <!-- key here is the camp_id and id is the ad_id-->
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>

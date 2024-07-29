@@ -15,16 +15,23 @@
                 <div class="container-fluid">
                     <label class="navbar-brand">{{ first_name }} {{ last_name }}'s Dashboard</label>
                     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-                        <div class="navbar-nav">
-                            <a class="nav-link" href="/sponsor_dashboard/{{ sponsor_id }}">Profile</a>
-                            <a class="nav-link" href="/sponsor_all_campaigns/{{ sponsor_id }}">Campaign</a>
-                            <a class="nav-link active" href="/sponsor_find/{{ sponsor_id }}">Find</a>
-                            <a class="nav-link" href="#">Statistics</a>
-                            <a class="nav-link" href="#">Logout</a>
-                            <input class="form-control" type="search" placeholder="Search Influencers" aria-label="Search">
-                            <button type="submit" class="btn btn-success btn-sm">Search</button>
-                        </div>
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item"><a class="nav-link" href="/sponsor_dashboard/{{ sponsor_id }}">Profile</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/sponsor_all_campaigns/{{ sponsor_id }}">Campaign</a></li>
+                            <li class="nav-item"><a class="nav-link active" href="/sponsor_find/{{ sponsor_id }}">Find</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#">Statistics</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#">Logout</a></li>
+                        </ul>
                     </div>
+                    <form class="d-flex" method="GET" action="/sponsor_find/{{ sponsor_id }}">
+                        <select class="form-control" name="niche_id">
+                            <option value="" disabled selected>Select niche to filter on</option>
+                            {% for niche in niches %}
+                                <option value="{{ niche.id }}">{{ niche.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button class="btn btn-outline-warning" type="submit">Filter</button>
+                    </form>
                 </div>
             </nav>
         </div>
@@ -60,7 +67,7 @@
                     </div>
                 {% endfor %}
             {% else %}
-                <h6 class="text-secondary">No influencers registered yet!</h6>
+                <h6 class="text-secondary">No influencers details to show</h6>
             {% endif %}
         </div>
 

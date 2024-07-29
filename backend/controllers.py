@@ -216,8 +216,16 @@ def influencer_reject_ad_request(influencer_id, ad_id):
 @app.route('/influencer_find/<int:influencer_id>', methods=['GET', 'POST'])
 def influencer_find(influencer_id):
     influencer = Influencer.query.filter_by(id=influencer_id).first()
-    return render_template('influencer_find.html', fname=influencer.first_name, lname=influencer.last_name, influencer_id=influencer_id, 
-                           all_public_campaigns=fetch_all_public_campaigns(), all_ads=fetch_all_ads())
+    niches = Niche.query.all()
+    filtered_niche_id = request.args.get('niche_id')
+    if not filtered_niche_id:
+        # no filter has been selcted so show all the public campaigns and all the ads from public, unflagged campaigns
+        return render_template('influencer_find.html', fname=influencer.first_name, lname=influencer.last_name, influencer_id=influencer_id, 
+                           all_public_campaigns=fetch_all_public_campaigns(), all_ads=fetch_all_ads(), niches=niches)
+    else:
+        # if a niche is selected to be used a filter
+        return render_template('influencer_find.html', fname=influencer.first_name, lname=influencer.last_name, influencer_id=influencer_id, 
+                               all_ads=fetch_all_ads(filtered_niche_id), niches=niches)
 
 
 # when an influencer requests for an ad, she/he changes the status of that ad_request form none to requested and adds his own id in the 
@@ -309,9 +317,11 @@ def sponsor_reject_ad_request(sponsor_id, ad_id):
 
 @app.route('/sponsor_find/<int:sponsor_id>', methods=['GET', 'POST'])
 def sponsor_find(sponsor_id):
+    filtered_niche_id = request.args.get('niche_id')
+    niches = Niche.query.all()
     sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
     return render_template('sponsor_find.html', first_name=sponsor.first_name, last_name=sponsor.last_name, sponsor_id=sponsor_id, 
-                           all_influencers=fetch_influencer_details_for_sponsor())
+                           all_influencers=fetch_influencer_details_for_sponsor(filtered_niche_id), niches=niches)
 
 
 @app.route('/campaign_details/<int:sponsor_id>/<int:camp_id>', methods=['GET', 'POST'])
@@ -647,14 +657,25 @@ def fetch_requested_ad_requests_for_sponsor(sponsor_id):
 
 
 '''function for retrieving all (unflagged) influencer details for sponsor find page'''
-def fetch_influencer_details_for_sponsor():
-    influencers = (db.session.query(Influencer.id, Influencer.first_name, Influencer.last_name,
-                                   Niche.name.label('niche_name'),
-                                   Reach.platform, Reach.profile_link, Reach.followers)
-                                   .join(Influencer_Niche, Influencer_Niche.influencer_id==Influencer.id)
-                                   .join(Niche, Niche.id==Influencer_Niche.niche_id)
-                                   .join(Reach, Reach.influencer_id==Influencer.id)
-                                   .filter(Influencer.flagged==False).all())
+def fetch_influencer_details_for_sponsor(niche_id = None):
+    if niche_id: 
+        # if a niche_id has been provided then filter only those influencers that have this niche associated with them
+        influencers = (db.session.query(Influencer.id, Influencer.first_name, Influencer.last_name,
+                                    Niche.name.label('niche_name'),
+                                    Reach.platform, Reach.profile_link, Reach.followers)
+                                    .join(Influencer_Niche, Influencer_Niche.influencer_id==Influencer.id)
+                                    .join(Niche, Niche.id==Influencer_Niche.niche_id)
+                                    .join(Reach, Reach.influencer_id==Influencer.id)
+                                    .filter(Influencer.flagged==False, Niche.id==niche_id).all())
+    else: 
+        # if no niche_id is passed, it is None by default and all influencers are to be queried from the database.
+        influencers = (db.session.query(Influencer.id, Influencer.first_name, Influencer.last_name,
+                                    Niche.name.label('niche_name'),
+                                    Reach.platform, Reach.profile_link, Reach.followers)
+                                    .join(Influencer_Niche, Influencer_Niche.influencer_id==Influencer.id)
+                                    .join(Niche, Niche.id==Influencer_Niche.niche_id)
+                                    .join(Reach, Reach.influencer_id==Influencer.id)
+                                    .filter(Influencer.flagged==False).all())
     all_influencers = {}
     for influencer in influencers:
         if influencer.id not in all_influencers.keys():
@@ -777,14 +798,25 @@ def fetch_requested_ad_requests_of_influencer(influencer_id):
 
 
 '''function for retreiving the ad requests of all public and unflagged campaigns for influencer_find page'''
-def fetch_all_ads():
-    ad_requests = (db.session.query(Ad_Request.id, Ad_Request.title.label('ad_title'), Ad_Request.payment_amount, Ad_Request.requirement, Ad_Request.influencer_id,
-                            Campaign.title.label('campaign_title'), Campaign.description, Campaign.goal, Campaign.start_date, Campaign.end_date,
-                            Sponsor.first_name, Sponsor.last_name, Sponsor.type, Niche.name.label('niche_name'))
-                            .join(Campaign, Campaign.id==Ad_Request.campaign_id)
-                            .join(Sponsor, Campaign.sponsor_id==Sponsor.id)
-                            .join(Niche, Ad_Request.niche_id==Niche.id)
-                            .filter(Campaign.flagged==False, Campaign.visibility=='public').all())
+def fetch_all_ads(niche_id = None):
+    if niche_id:
+        # if a niche name has been passed as an argument to the function then filter ads based on that.
+        ad_requests = (db.session.query(Ad_Request.id, Ad_Request.title.label('ad_title'), Ad_Request.payment_amount, Ad_Request.requirement, Ad_Request.influencer_id,
+                                Campaign.title.label('campaign_title'), Campaign.description, Campaign.goal, Campaign.start_date, Campaign.end_date,
+                                Sponsor.first_name, Sponsor.last_name, Sponsor.type, Niche.name.label('niche_name'), Niche.id.label('niche_id'))
+                                .join(Campaign, Campaign.id==Ad_Request.campaign_id)
+                                .join(Sponsor, Campaign.sponsor_id==Sponsor.id)
+                                .join(Niche, Ad_Request.niche_id==Niche.id)
+                                .filter(Campaign.flagged==False, Campaign.visibility=='public', Niche.id==niche_id).all())
+    else:
+        # if no niche name has been passed, it is None by default and we'll query all the ads irrespective of their niche from db.
+        ad_requests = (db.session.query(Ad_Request.id, Ad_Request.title.label('ad_title'), Ad_Request.payment_amount, Ad_Request.requirement, Ad_Request.influencer_id,
+                                Campaign.title.label('campaign_title'), Campaign.description, Campaign.goal, Campaign.start_date, Campaign.end_date,
+                                Sponsor.first_name, Sponsor.last_name, Sponsor.type, Niche.name.label('niche_name'))
+                                .join(Campaign, Campaign.id==Ad_Request.campaign_id)
+                                .join(Sponsor, Campaign.sponsor_id==Sponsor.id)
+                                .join(Niche, Ad_Request.niche_id==Niche.id)
+                                .filter(Campaign.flagged==False, Campaign.visibility=='public').all())
     all_ads = {}
     for ad in ad_requests:
         if ad.id not in all_ads.keys():
