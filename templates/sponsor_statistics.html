@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sponsor Statistics</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+<body>
+    <div id="container">
+        <!-- NAVIGATION BAR -->
+        <div id="panel">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <div class="container-fluid">
+                    <label class="navbar-brand">{{ first_name }} {{ last_name }}'s Dashboard</label>
+                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item"><a class="nav-link" href="/sponsor_dashboard/{{ sponsor_id }}">Profile</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/sponsor_all_campaigns/{{ sponsor_id }}">Campaign</a></li>
+                            <li class="nav-item"><a class="nav-link active" href="/sponsor_find/{{ sponsor_id }}">Find</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/sponsor_statistics/{{ sponsor_id }}">Statistics</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#">Logout</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <h1>Sponsor Statistics</h1>
+        <h2>Campaign Status Histogram</h2>
+        <img src="/static/statistics/camp_hist.png" alt="Campaign Histogram">
+        
+        <h2>Ad Status Histogram</h2>
+        <img src="/static/statistics/ad_hist.png" alt="Ad Histogram">
+
+    </div>
+</body>
+</html>

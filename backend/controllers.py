@@ -2,6 +2,9 @@ from flask import Flask, render_template, request
 from flask import current_app as app
 from .models import *
 from datetime import datetime
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
 
 # ---------------------------------------------------------- ROUTES ---------------------------------------------------------- #
 @app.route('/')
@@ -120,6 +123,56 @@ def unflag_campaign(campaign_id):
 def admin_find():
     return render_template('admin_find.html', active_campaigns=fetch_active_campaigns(), completed_campaigns=fetch_completed_campaigns(), 
                            all_influencers=fetch_all_influencers(), all_sponsors=fetch_all_sponsors(), scheduled_campaigns=fetch_scheduled_campaigns())
+
+
+@app.route('/admin_statistics')
+def admin_statistics():
+    # plotting for campaign's attributes
+    campaigns = Campaign.query.all()
+    ads = Ad_Request.query.all()
+                
+    niches = [ad.niche_id for ad in ads]
+    plt.clf()
+    plt.hist(niches)
+    plt.xlabel('Niche IDs')
+    plt.ylabel('Number of Ads')
+    plt.title('Ads by Niche')
+    plt.savefig('static/statistics/admin/ad_niche.png')
+
+    status = [ad.status for ad in ads if ad.status != None]
+    plt.clf()
+    plt.hist(status)
+    plt.xlabel('Ad Status')
+    plt.ylabel('Number of Ads')
+    plt.title('Ads by Status')
+    plt.savefig('static/statistics/admin/ad_status.png')
+
+    visibility = [campaign.visibility for campaign in campaigns]
+    public_campaigns = visibility.count('public')
+    private_campaigns = visibility.count('private')
+    plt.clf()
+    plt.pie([public_campaigns, private_campaigns], explode=(0.1, 0), labels=['Public', 'Private'], colors=['pink', 'palevioletred'], autopct='%1.1f%%', shadow=True, startangle=140)
+    plt.title('Campaign Visibility')
+    plt.savefig('static/statistics/admin/campaign_visibility.png')
+
+    # Query the number of campaigns for each sponsor
+    sponsor_campaigns = db.session.query(Campaign.sponsor_id, db.func.count(Campaign.id)).group_by(Campaign.sponsor_id).all()
+    sponsor_ids = [sc[0] for sc in sponsor_campaigns]
+    campaign_counts = [sc[1] for sc in sponsor_campaigns]
+    plt.clf()
+    plt.pie(campaign_counts, labels=sponsor_ids, autopct='%1.1f%%', shadow=True, startangle=140)
+    plt.title('Number of Campaigns per Sponsor')
+    plt.savefig('static/statistics/admin/sponsor_campaigns.png')
+
+    # Query the total number of influencers and sponsors
+    total_influencers = db.session.query(Influencer).count()
+    total_sponsors = db.session.query(Sponsor).count()
+    plt.clf()
+    plt.pie([total_influencers, total_sponsors], labels=['Influencers', 'Sponsors'],explode=(0.1, 0), autopct='%1.1f%%', colors=['pink', 'palevioletred'], shadow=True, startangle=140)
+    plt.title('Total Number of Influencers and Sponsors')
+    plt.savefig('static/statistics/admin/influencers_sponsors_count.png')
+    
+    return render_template('admin_statistics.html')
 
 
 @app.route('/campaign_details/<int:camp_id>', methods=['GET', 'POST'])
@@ -324,6 +377,27 @@ def sponsor_find(sponsor_id):
                            all_influencers=fetch_influencer_details_for_sponsor(filtered_niche_id), niches=niches)
 
 
+# @app.route('/sponsor_statistics/<int:sponsor_id>')
+# def sponsor_statistics(sponsor_id):
+#     current_date = datetime.now().date()
+#     # Fetching data from database
+#     completed_campaigns = Campaign.query.filter(Campaign.sponsor_id==sponsor_id, Campaign.end_date < current_date).count()
+#     scheduled_campaigns = Campaign.query.filter(Campaign.sponsor_id==sponsor_id, Campaign.start_date > current_date).count()
+#     active_campaigns = Campaign.query.filter(Campaign.sponsor_id==sponsor_id, Campaign.start_date < current_date, Campaign.end_date > current_date).count()
+#     completed_ads = (db.session.query(Ad_Request.status)
+#                     .join(Campaign, Campaign.id == Ad_Request.campaign_id)
+#                     .join(Sponsor, Sponsor.id == Campaign.sponsor_id)
+#                     .filter(Sponsor.id==sponsor_id, Ad_Request.status=='completed').count())
+#     scheduled_ads = (db.session.query(Ad_Request.status)
+#                     .join(Campaign, Campaign.id == Ad_Request.campaign_id)
+#                     .join(Sponsor, Sponsor.id == Campaign.sponsor_id)
+#                     .filter(Sponsor.id==sponsor_id, Campaign.start_date > current_date).count())
+#     active_ads = (db.session.query(Ad_Request.status)
+#                   .join(Campaign, Campaign.id == Ad_Request.campaign_id)
+#                   .join(Sponsor, Sponsor.id == Campaign.sponsor_id)
+#                   .filter(Sponsor.id == sponsor_id, Ad_Request.status == 'accepted').count())
+    
+
 @app.route('/campaign_details/<int:sponsor_id>/<int:camp_id>', methods=['GET', 'POST'])
 def particular_campaign_details_for_sponsor(sponsor_id, camp_id):
     sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
@@ -488,7 +562,7 @@ def edit_ad_request(sponsor_id, camp_id, ad_id):
 
     # getting values from form
     title = request.form.get('adTitle')
-    payment_amount = flaot(request.form.get('adPaymentAmount'))
+    payment_amount = float(request.form.get('adPaymentAmount'))
     requirement = request.form.get('adRequirement')
     niche_id = request.form.get('adNiche')
 
