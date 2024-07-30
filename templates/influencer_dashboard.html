@@ -33,31 +33,32 @@
 
                 {% for key, value in influencer_info.items() %}
                     <div class="col-4 card">
-                        <div class="row-8 my-4 card">
-                            <img src="{{ url_for('static', filename='profile_pics/' ~ value.profile_pic) }}" alt="Profile Pic" class="img-fluid">
+                        <div class="row">
+                            <h4 class="text-center mt-2">Your Details</h4>
                         </div>
-                        <div class="row-2 card">
+                        <div class="row">
+
                             <li><u>Name</u>: {{ value.fname }} {{ value.lname }}</li>
                             <li><u>Username</u>: {{ value.username }}</li>
                             <li><u>Email</u>: {{ value.email }}</li>
                             <li><u>Earnings so far</u>: {{ value.earning }}</li>
+                            <li><u>Associated Accounts</u>:</li>
                             <ul class="list-unstyled">
-                                <li>Associated Accounts:</li>
                                 {% for account, info in value.social_accounts.items() %}
-                                    <li>
-                                        <italic>{{ account }}:</italic>
-                                        <ul>
-                                            <li>Followers count: {{ info.followers }}</li>
-                                            <li>Profile Link: <a href="{{ info.profile_link }}" target="_blank">{{ info.profile_link }}</a></li>
-                                        </ul>
-                                    </li>
+                                    <i>{{ account }}:</i>
+                                    <ul>
+                                        <li>Followers count: {{ info.followers }}</li>
+                                        <li>Profile Link: <a href="{{ info.profile_link }}" target="_blank">{{ info.profile_link }}</a></li>
+                                    </ul>
                                 {% endfor %}
-                                <li>Niches of Influencer:</li>
-                                <ul>
-                                    {% for niche in value.niches %}
+                            </ul>
+                            <li><u>Niches of Influencer</u>:</li>
+                            <ul class="list-unstyled">
+                                {% for niche in value.niches %}
+                                    <ul>
                                         <li>{{ niche }}</li>
-                                    {% endfor %}
-                                </ul>
+                                    </ul>
+                                {% endfor %}
                             </ul>
                         </div>
                     </div>
@@ -107,7 +108,7 @@
                         <!-- These are the 'pending' requests that have been given to this influencer by a sponsor and are yet to accepted/rejected-->
                         <div class="row">
                             <h5 class="text-center"><br>New Requests</h5>
-                            <h6 class="text-secondary">(These are the ads assigned to you by sponsors)</h6>
+                            <h6 class="text-secondary text-center">(These are the ads assigned to you by sponsors)</h6>
 
                             {% if pending_ads %}
                                 {% for key, value in pending_ads.items() %}
@@ -143,7 +144,7 @@
                         <!-- These are the 'requested' requests that the influencer has requested for and are yet to accepted/rejected by the sponsor -->
                         <div class="row">
                             <h5 class="text-center"><br>Requested Ads</h5>
-                            <h6 class="text-secondary">(These are the ads you have requested to work on)</h6>
+                            <h6 class="text-secondary text-center">(These are the ads you have requested to work on)</h6>
 
                             {% if requested_ads %}
                                 {% for key, value in requested_ads.items() %}

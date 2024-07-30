@@ -27,7 +27,7 @@ class Influencer(db.Model):
     password = db.Column(db.String, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
     earning = db.Column(db.Integer, default=0)
-    profile_pic = db.Column(db.String)
+    profile_pic = db.Column(db.String)      # remove this attribute
     flagged = db.Column(db.Boolean, default=False)
     reach = db.relationship('Reach', backref='influencer', cascade='all, delete-orphan')
     ad_request = db.relationship('Ad_Request', backref='influencer')
