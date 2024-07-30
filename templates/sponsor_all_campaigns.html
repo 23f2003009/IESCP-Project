@@ -120,7 +120,9 @@
             {% else %}
                 <h6 class="text-secondary">No campaigns completed yet</h6>
             {% endif %}
+            
 
+            {% if error %} <div class="text-danger text-center">{{ error }}</div>  {% endif %}
             <!-- ADD CAMPAIGN MODAL TRIGGER BUTTON -->
             <div class="text-center mt-4">
                 <button type="button" class=" btn btn-success" data-bs-toggle="modal" data-bs-target="#addCampaignModal">+ Add Campaign</button>

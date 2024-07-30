@@ -79,7 +79,8 @@
                 </div>
             {% endif %}
 
-
+            
+            {% if error %} <p class="text-danger text-center">{{ error }} </p> {% endif %}
             <!-- ADD AD REQUEST MODAL TRIGGER BUTTON -->
             <div class="text-center mt-4">
                 <button type="button" class=" btn btn-success" data-bs-toggle="modal" data-bs-target="#adRequestModal{{ key }}">Create New Ad Request</button>

@@ -80,7 +80,7 @@ class Ad_Request(db.Model):
     influencer_id = db.Column(db.Integer, db.ForeignKey('influencer.id'))
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'), nullable=False)
     title = db.Column(db.String, nullable=False)
-    status = db.Column(db.Enum('pending', 'accepted', 'rejected', 'requested'))      # remove the rejected status
+    status = db.Column(db.Enum('pending', 'accepted', 'rejected', 'requested'))      # replace the rejected status with completed
     # when a sposnor gives an ad to influencer it will be 'pending' while if an influencer requests a sponsor for an 
     # ad then the status of that ad would be 'requested' othereise it is None 
     payment_amount = db.Column(db.Float, nullable=False)

@@ -341,23 +341,34 @@ def sponsor_all_campaigns(sponsor_id):
 
 @app.route('/add_campaign/<int:sponsor_id>', methods=['GET', 'POST'])
 def add_campaign(sponsor_id):
+    sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
+
+    # retrieving details from form
     title = request.form.get('campaignTitle')
     description = request.form.get('campaignDescription')
-    budget = request.form.get('campaignBudget')
+    budget = float(request.form.get('campaignBudget'))
     start_date_str = request.form.get('campaignStartDate')
     end_date_str = request.form.get('campaignEndDate')
     visibility = request.form.get('campaignVisibility')
     goal = request.form.get('campaignGoal')
 
+    # getting dates in the desired format
     start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
     end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
 
+    # Checking if the total campaign budget exceeds the sponsor budget
+    is_valid, message = check_total_campaign_budget(sponsor_id, budget)
+    if not is_valid:
+        return render_template('sponsor_all_campaigns.html', active_campaigns=fetch_active_campaigns(sponsor_id), sponsor_id=sponsor_id, 
+                           first_name=sponsor.first_name, last_name=sponsor.last_name, completed_campaigns=fetch_completed_campaigns(sponsor_id),
+                           scheduled_campaigns=fetch_scheduled_campaigns(sponsor_id), error=message)
+
+    # creating a new campaign
     new_campaign = Campaign(title=title, description=description, budget=budget, start_date=start_date, end_date=end_date, 
                             visibility=visibility, goal=goal, sponsor_id=sponsor_id)
     db.session.add(new_campaign)
     db.session.commit()
 
-    sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
     return render_template('sponsor_all_campaigns.html', active_campaigns=fetch_active_campaigns(sponsor_id), sponsor_id=sponsor_id, 
                            first_name=sponsor.first_name, last_name=sponsor.last_name, completed_campaigns=fetch_completed_campaigns(sponsor_id),
                            scheduled_campaigns=fetch_scheduled_campaigns(sponsor_id))
@@ -365,17 +376,28 @@ def add_campaign(sponsor_id):
 
 @app.route('/edit_campaign/<int:sponsor_id>/<int:camp_id>', methods=['GET', 'POST'])
 def edit_campaign(sponsor_id, camp_id):
+    sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
+
+    # retrieving values from the form
     title = request.form.get('campaignTitle')
     description = request.form.get('campaignDescription')
-    budget = request.form.get('campaignBudget')
+    budget = float(request.form.get('campaignBudget'))
     start_date = request.form.get('campaignStartDate')
     end_date = request.form.get('campaignEndDate')
     visibility = request.form.get('campaignVisibility')
     goal = request.form.get('campaignGoal')
 
+    # checking if the campaign's budget exceeds the total sponsor budget
+    is_valid, message = check_total_campaign_budget(sponsor_id, budget)
+    if not is_valid:
+        return render_template('sponsor_all_campaigns.html', first_name=sponsor.first_name, last_name=sponsor.last_name, sponsor_id=sponsor_id, 
+                           active_campaigns=fetch_active_campaigns(sponsor_id), completed_campaigns=fetch_completed_campaigns(sponsor_id),
+                           scheduled_campaigns=fetch_scheduled_campaigns(sponsor_id), error=message)
+
     # locate the record where the edits are to be made
     existing_campaign = Campaign.query.filter_by(id=camp_id).first()
 
+    # editing the details
     existing_campaign.title = title
     existing_campaign.description = description
     existing_campaign.budget = budget
@@ -386,7 +408,6 @@ def edit_campaign(sponsor_id, camp_id):
 
     db.session.commit()
 
-    sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
     return render_template('sponsor_all_campaigns.html', first_name=sponsor.first_name, last_name=sponsor.last_name, sponsor_id=sponsor_id, 
                            active_campaigns=fetch_active_campaigns(sponsor_id), completed_campaigns=fetch_completed_campaigns(sponsor_id),
                            scheduled_campaigns=fetch_scheduled_campaigns(sponsor_id))
@@ -412,7 +433,7 @@ def create_ad_request(sponsor_id, camp_id):
 
     # getting values from form
     title = request.form.get('adTitle')
-    payment_amount = request.form.get('adPaymentAmount')
+    payment_amount = float(request.form.get('adPaymentAmount'))
     requirement = request.form.get('adRequirement')
     niche_id = request.form.get('adNiche')
 
@@ -423,6 +444,12 @@ def create_ad_request(sponsor_id, camp_id):
         db.session.add(new_niche)
         db.session.commit()
         niche_id = new_niche.id
+
+    # checking if the ad's payment amount exceeds the total campaign budget
+    is_valid, message = check_total_payment_amount(camp_id, payment_amount)
+    if not is_valid:
+        return render_template('sponsor_campaign_details.html', sponsor_id=sponsor_id, campaign_info=fetch_campaign_details(camp_id),
+                    first_name=sponsor.first_name, last_name=sponsor.last_name, niches=niches, error=message)
 
     # creating new ad request
     new_ad_request = Ad_Request(title=title, requirement=requirement, payment_amount=payment_amount, niche_id=niche_id, campaign_id=camp_id)
@@ -461,9 +488,15 @@ def edit_ad_request(sponsor_id, camp_id, ad_id):
 
     # getting values from form
     title = request.form.get('adTitle')
-    payment_amount = request.form.get('adPaymentAmount')
+    payment_amount = flaot(request.form.get('adPaymentAmount'))
     requirement = request.form.get('adRequirement')
     niche_id = request.form.get('adNiche')
+
+    # cheching if after editing the payment amount exceeds the toal cmapaign budget
+    is_valid, message = check_total_payment_amount(camp_id, payment_amount)
+    if not is_valid:
+        return render_template('sponsor_campaign_details', sponsor_id=sponsor_id, campaign_info=fetch_campaign_details(camp_id),
+                    first_name=sponsor.first_name, last_name=sponsor.last_name, niches=niches, error=message)
 
     # locate the record where the edits are to be made
     existing_ad = Ad_Request.query.filter_by(id=ad_id).first()
@@ -684,6 +717,27 @@ def fetch_influencer_details_for_sponsor(niche_id = None):
         
     return all_influencers
 
+'''function for checking if the new campaign's budget will cumulatively exceed the total sponsor budget'''
+def check_total_campaign_budget(sponsor_id, new_campaign_budget):
+    campaigns = Campaign.query.filter_by(sponsor_id=sponsor_id).all()
+    total_budget = sum(campaign.budget for campaign in campaigns) + new_campaign_budget
+    sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
+    if sponsor.budget < total_budget:
+        return False, f"Total campaign budget exceeded the sponsor budget of {sponsor.budget}. Try again!"
+    return True, ""
+
+
+'''function for checking if the new ad's budget will cumulatively exceed the total campaign budget'''
+def check_total_payment_amount(camp_id, new_ad_payment):
+    ads = Ad_Request.query.filter_by(campaign_id=camp_id).all()
+    total_payment = sum(ad.payment_amount for ad in ads) + new_ad_payment
+    campaign = Campaign.query.filter_by(id=camp_id).first()
+    if campaign.budget < total_payment:
+        return False, f"Total payment amount exceeded the campaign budget of {campaign.budget}. Try again!"
+    return True, ""
+
+
+
 '''function for retrieving the details of a particular campaign and its associated ad_requests for sponsor_campaign_details and admin_campaign_details page'''
 def fetch_campaign_details(camp_id):
     campaigns = (db.session.query(Campaign.id.label('campaign_id'), Campaign.title.label('campaign_title'), Campaign.description, Campaign.flagged,
@@ -807,7 +861,7 @@ def fetch_all_ads(niche_id = None):
                                 .join(Campaign, Campaign.id==Ad_Request.campaign_id)
                                 .join(Sponsor, Campaign.sponsor_id==Sponsor.id)
                                 .join(Niche, Ad_Request.niche_id==Niche.id)
-                                .filter(Campaign.flagged==False, Campaign.visibility=='public', Niche.id==niche_id).all())
+                                .filter(Campaign.flagged==False, Campaign.visibility=='public', Ad_Request.status!='completed', Niche.id==niche_id).all())
     else:
         # if no niche name has been passed, it is None by default and we'll query all the ads irrespective of their niche from db.
         ad_requests = (db.session.query(Ad_Request.id, Ad_Request.title.label('ad_title'), Ad_Request.payment_amount, Ad_Request.requirement, Ad_Request.influencer_id,
@@ -836,3 +890,23 @@ def fetch_all_public_campaigns():
             all_public_campaigns[campaign.id] = {'title': campaign.title, 'description': campaign.description, 'goal': campaign.goal,
                                                  'sdate': campaign.start_date, 'edate': campaign.end_date, 'budget': campaign.budget}
     return all_public_campaigns
+
+
+'''function for checking how many ads got completed'''
+def check_ad_requests():
+    current_date = datetime.now().date()
+    
+    # Retrieve all ad requests
+    ad_requests = Ad_Request.query.all()
+    
+    for ad_request in ad_requests:
+        campaign = Campaign.query.get(ad_request.campaign_id)
+        if campaign and campaign.end_date < current_date:
+            if ad_request.status != 'completed':
+                # Retrieve the influencer associated with the ad request
+                influencer = Influencer.query.get(ad_request.influencer_id)
+                if influencer:
+                    ad_request.status = 'completed'     # Update the status of the ad request to 'completed'
+                    influencer.earnings += ad_request.payment_amount   # Update the influencer's earnings
+                    
+                    db.session.commit()
