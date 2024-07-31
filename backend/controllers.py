@@ -5,6 +5,8 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Agg')
+from matplotlib.ticker import MaxNLocator
+import numpy as np
 
 # ---------------------------------------------------------- ROUTES ---------------------------------------------------------- #
 @app.route('/')
@@ -127,49 +129,92 @@ def admin_find():
 
 @app.route('/admin_statistics')
 def admin_statistics():
-    # plotting for campaign's attributes
     campaigns = Campaign.query.all()
     ads = Ad_Request.query.all()
-                
-    niches = [ad.niche_id for ad in ads]
-    plt.clf()
-    plt.hist(niches)
-    plt.xlabel('Niche IDs')
-    plt.ylabel('Number of Ads')
-    plt.title('Ads by Niche')
-    plt.savefig('static/statistics/admin/ad_niche.png')
+    sponsors = Sponsor.query.all()
+    influencers = Influencer.query.all()
 
-    status = [ad.status for ad in ads if ad.status != None]
-    plt.clf()
-    plt.hist(status)
-    plt.xlabel('Ad Status')
-    plt.ylabel('Number of Ads')
-    plt.title('Ads by Status')
-    plt.savefig('static/statistics/admin/ad_status.png')
-
+    status = [ad.status for ad in ads if ad.status is not None]
     visibility = [campaign.visibility for campaign in campaigns]
     public_campaigns = visibility.count('public')
     private_campaigns = visibility.count('private')
+
+    flagged_campaigns = sum(1 for campaign in campaigns if campaign.flagged)
+    unflagged_campaigns = len(campaigns) - flagged_campaigns
+    flagged_sponsors = sum(1 for sponsor in sponsors if sponsor.flagged)
+    unflagged_sponsors = len(sponsors) - flagged_sponsors
+    flagged_influencers = sum(1 for influencer in influencers if influencer.flagged)
+    unflagged_influencers = len(influencers) - flagged_influencers
+    
+    categories = ['Campaigns', 'Sponsors', 'Influencers']
+    flagged = [flagged_campaigns, flagged_sponsors, flagged_influencers]
+    unflagged = [unflagged_campaigns, unflagged_sponsors, unflagged_influencers]
+
+    fig, ax = plt.subplots(figsize=(4, 4))
+    plt.clf()
+    bar_width = 0.25
+    index = np.arange(len(categories))
+    plt.bar(index, unflagged, bar_width, label='Unflagged', color='pink')
+    plt.bar(index + bar_width, flagged, bar_width, label='Flagged', color='palevioletred')
+    plt.xlabel('Categories')
+    plt.ylabel('Count')
+    plt.xticks(index + bar_width / 2, categories)
+    plt.legend()
+    plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
+    plt.tight_layout()
+    plt.savefig('static/statistics/admin/flagged_unflagged.png')
+
+    # Query the count of ads for each niche
+    niche_ad_counts = (db.session.query(Niche.name, db.func.count(Ad_Request.id))
+                       .join(Ad_Request, Niche.id == Ad_Request.niche_id)
+                       .group_by(Niche.name).all())
+    niche_names = [n[0] for n in niche_ad_counts]
+    ad_counts = [n[1] for n in niche_ad_counts]
+    fig, ax = plt.subplots(figsize=(4, 4))
+    plt.clf()
+    plt.bar(niche_names, ad_counts, bar_width, color='palevioletred')
+    plt.xlabel('Niche Names')
+    plt.ylabel('Number of Ads')
+    plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
+    plt.xticks(rotation=30, ha='right')  # Rotate x-axis labels for better readability
+    plt.tight_layout()  # Adjust layout to make room for x-axis labels    
+    plt.savefig('static/statistics/admin/ad_niche.png')
+    
+    fig, ax = plt.subplots(figsize=(4, 4))
+    plt.clf()
+    plt.hist(status, 10, color='palevioletred')
+    plt.xlabel('Ad Status')
+    plt.ylabel('Number of Ads')
+    plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
+    plt.savefig('static/statistics/admin/ad_status.png')
+
+    fig, ax = plt.subplots(figsize=(4, 4))
     plt.clf()
     plt.pie([public_campaigns, private_campaigns], explode=(0.1, 0), labels=['Public', 'Private'], colors=['pink', 'palevioletred'], autopct='%1.1f%%', shadow=True, startangle=140)
-    plt.title('Campaign Visibility')
     plt.savefig('static/statistics/admin/campaign_visibility.png')
 
     # Query the number of campaigns for each sponsor
-    sponsor_campaigns = db.session.query(Campaign.sponsor_id, db.func.count(Campaign.id)).group_by(Campaign.sponsor_id).all()
-    sponsor_ids = [sc[0] for sc in sponsor_campaigns]
-    campaign_counts = [sc[1] for sc in sponsor_campaigns]
+    sponsor_campaigns = (db.session.query(Sponsor.first_name, Sponsor.last_name, db.func.count(Campaign.id))
+                         .join(Campaign, Sponsor.id == Campaign.sponsor_id)
+                         .group_by(Sponsor.first_name, Sponsor.last_name).all())
+    sponsor_names = [f"{sc[0]} {sc[1]}" for sc in sponsor_campaigns]
+    campaign_counts = [sc[2] for sc in sponsor_campaigns]
+    fig, ax = plt.subplots(figsize=(4, 4))
     plt.clf()
-    plt.pie(campaign_counts, labels=sponsor_ids, autopct='%1.1f%%', shadow=True, startangle=140)
-    plt.title('Number of Campaigns per Sponsor')
+    plt.bar(sponsor_names, campaign_counts, bar_width, color='palevioletred')
+    plt.xlabel('Sponsors')
+    plt.ylabel('Number of Campaigns')
+    plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
+    plt.xticks(rotation=30, ha='right')   # Rotating x-axis labels for better readability
+    plt.tight_layout()  # to make room for x-axis labels
     plt.savefig('static/statistics/admin/sponsor_campaigns.png')
 
     # Query the total number of influencers and sponsors
     total_influencers = db.session.query(Influencer).count()
     total_sponsors = db.session.query(Sponsor).count()
+    fig, ax = plt.subplots(figsize=(4, 4))
     plt.clf()
     plt.pie([total_influencers, total_sponsors], labels=['Influencers', 'Sponsors'],explode=(0.1, 0), autopct='%1.1f%%', colors=['pink', 'palevioletred'], shadow=True, startangle=140)
-    plt.title('Total Number of Influencers and Sponsors')
     plt.savefig('static/statistics/admin/influencers_sponsors_count.png')
     
     return render_template('admin_statistics.html')
