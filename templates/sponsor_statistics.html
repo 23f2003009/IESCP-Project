@@ -18,8 +18,8 @@
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                             <li class="nav-item"><a class="nav-link" href="/sponsor_dashboard/{{ sponsor_id }}">Profile</a></li>
                             <li class="nav-item"><a class="nav-link" href="/sponsor_all_campaigns/{{ sponsor_id }}">Campaign</a></li>
-                            <li class="nav-item"><a class="nav-link active" href="/sponsor_find/{{ sponsor_id }}">Find</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/sponsor_statistics/{{ sponsor_id }}">Statistics</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/sponsor_find/{{ sponsor_id }}">Find</a></li>
+                            <li class="nav-item"><a class="nav-link active" href="/sponsor_statistics/{{ sponsor_id }}">Statistics</a></li>
                             <li class="nav-item"><a class="nav-link" href="#">Logout</a></li>
                         </ul>
                     </div>
@@ -27,12 +27,20 @@
             </nav>
         </div>
 
-        <h1>Sponsor Statistics</h1>
-        <h2>Campaign Status Histogram</h2>
-        <img src="/static/statistics/camp_hist.png" alt="Campaign Histogram">
-        
-        <h2>Ad Status Histogram</h2>
-        <img src="/static/statistics/ad_hist.png" alt="Ad Histogram">
+        <div class="row mt-4">
+            <div class="col-4">
+                <h5 class="text-center">Campaign Status Distribution</h5>
+                <img src="/static/statistics/sponsor/campaign_status.png" alt="Campaign status">
+            </div>
+            <div class="col-4">
+                <h5 class="text-center">Monthly Expenditure</h5>
+                <img src="/static/statistics/sponsor/monthly_expenditure.png" alt="Monthly expenditure">
+            </div>
+            <div class="col-4">
+                <h5 class="text-center">Ad Status Distribution</h5>
+                <img src="/static/statistics/sponsor/ad_status.png" alt="Ad status">
+            </div>
+        </div>
 
     </div>
 </body>

@@ -326,6 +326,41 @@ def influencer_find(influencer_id):
                                all_ads=fetch_all_ads(filtered_niche_id), niches=niches)
 
 
+@app.route('/influencer_statistics/<int:influencer_id>')
+def influencer_statistics(influencer_id):
+    influencer = Influencer.query.filter_by(id=influencer_id).first()
+    
+    # Fetch data
+    monthly_earnings = (db.session.query(
+                        db.func.strftime("%Y-%m", Campaign.end_date).label("month"),
+                        db.func.sum(Ad_Request.payment_amount).label("total_earnings"))
+                        .join(Campaign, Ad_Request.campaign_id == Campaign.id)
+                        .filter(Ad_Request.influencer_id == influencer_id, Ad_Request.status == 'completed')
+                        .group_by("month")
+                        .order_by("month").all())
+    
+    fig, ax = plt.subplots(figsize=(4, 4))
+    if monthly_earnings:
+        months, earnings = zip(*monthly_earnings)
+        plt.clf()
+        plt.plot(months, earnings, marker='o', linestyle='--', color='palevioletred')
+    plt.xlabel('Month')
+    plt.ylabel('Earnings')
+    plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
+    plt.savefig('static/statistics/influencer/monthly_earnings.png')
+    
+    # Ad status distribution
+    completed_ads = Ad_Request.query.filter(Ad_Request.influencer_id == influencer_id, Ad_Request.status == 'completed').count()
+    active_ads = Ad_Request.query.filter(Ad_Request.influencer_id == influencer_id, Ad_Request.status == 'accepted').count()
+    ad_categories = ['Completed', 'Active']
+    ad_values = [completed_ads, active_ads]
+    fig, ax = plt.subplots(figsize=(4, 4))
+    plt.clf()
+    plt.pie(ad_values, labels=ad_categories, colors=['pink', 'palevioletred'], autopct='%1.1f%%', startangle=140, explode=(0.05, 0), shadow=True)
+    plt.savefig('static/statistics/influencer/ad_status.png')
+    
+    return render_template('influencer_statistics.html', fname=influencer.first_name, lname=influencer.last_name, influencer_id=influencer_id)
+
 # when an influencer requests for an ad, she/he changes the status of that ad_request form none to requested and adds his own id in the 
 # influencer_id attribute of the ad_request.
 @app.route('/request_sponsor_for_ad/<int:influencer_id>/<int:ad_id>', methods=['GET', 'POST'])
@@ -338,7 +373,6 @@ def request_sponsor_for_ad(influencer_id, ad_id):
     influencer = Influencer.query.filter_by(id=influencer_id).first()
     return render_template('influencer_find.html', fname=influencer.first_name, lname=influencer.last_name, influencer_id=influencer_id, 
                            all_public_campaigns=fetch_all_public_campaigns(), all_ads=fetch_all_ads())
-
 
 
 @app.route('/campaign_details_for_influencer/<int:influencer_id>/<int:camp_id>', methods=['GET', 'POST'])
@@ -422,25 +456,56 @@ def sponsor_find(sponsor_id):
                            all_influencers=fetch_influencer_details_for_sponsor(filtered_niche_id), niches=niches)
 
 
-# @app.route('/sponsor_statistics/<int:sponsor_id>')
-# def sponsor_statistics(sponsor_id):
-#     current_date = datetime.now().date()
-#     # Fetching data from database
-#     completed_campaigns = Campaign.query.filter(Campaign.sponsor_id==sponsor_id, Campaign.end_date < current_date).count()
-#     scheduled_campaigns = Campaign.query.filter(Campaign.sponsor_id==sponsor_id, Campaign.start_date > current_date).count()
-#     active_campaigns = Campaign.query.filter(Campaign.sponsor_id==sponsor_id, Campaign.start_date < current_date, Campaign.end_date > current_date).count()
-#     completed_ads = (db.session.query(Ad_Request.status)
-#                     .join(Campaign, Campaign.id == Ad_Request.campaign_id)
-#                     .join(Sponsor, Sponsor.id == Campaign.sponsor_id)
-#                     .filter(Sponsor.id==sponsor_id, Ad_Request.status=='completed').count())
-#     scheduled_ads = (db.session.query(Ad_Request.status)
-#                     .join(Campaign, Campaign.id == Ad_Request.campaign_id)
-#                     .join(Sponsor, Sponsor.id == Campaign.sponsor_id)
-#                     .filter(Sponsor.id==sponsor_id, Campaign.start_date > current_date).count())
-#     active_ads = (db.session.query(Ad_Request.status)
-#                   .join(Campaign, Campaign.id == Ad_Request.campaign_id)
-#                   .join(Sponsor, Sponsor.id == Campaign.sponsor_id)
-#                   .filter(Sponsor.id == sponsor_id, Ad_Request.status == 'accepted').count())
+@app.route('/sponsor_statistics/<int:sponsor_id>')
+def sponsor_statistics(sponsor_id):
+    sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
+    current_date = datetime.now().date()
+    completed_campaigns = Campaign.query.filter(Campaign.sponsor_id == sponsor_id, Campaign.end_date < current_date).count()
+    scheduled_campaigns = Campaign.query.filter(Campaign.sponsor_id == sponsor_id, Campaign.start_date > current_date).count()
+    active_campaigns = Campaign.query.filter(Campaign.sponsor_id == sponsor_id, Campaign.start_date < current_date, Campaign.end_date > current_date).count()
+    completed_ads = (db.session.query(Ad_Request)
+                     .join(Campaign, Campaign.id == Ad_Request.campaign_id)
+                     .filter(Campaign.sponsor_id == sponsor_id, Ad_Request.status == 'completed').count())
+    scheduled_ads = (db.session.query(Ad_Request)
+                     .join(Campaign, Campaign.id == Ad_Request.campaign_id)
+                     .filter(Campaign.sponsor_id == sponsor_id, Campaign.start_date > current_date).count())
+    active_ads = (db.session.query(Ad_Request)
+                  .join(Campaign, Campaign.id == Ad_Request.campaign_id)
+                  .filter(Campaign.sponsor_id == sponsor_id, Ad_Request.status == 'accepted').count())
+    
+    # Campaign status distribution
+    fig, ax = plt.subplots(figsize=(4, 4))
+    plt.clf()
+    categories = ['Completed', 'Scheduled', 'Active']
+    values = [completed_campaigns, scheduled_campaigns, active_campaigns]
+    plt.pie(values, labels=categories, autopct='%1.1f%%', colors=['pink', 'mistyrose', 'palevioletred'], startangle=140, explode=(0, 0, 0.05), shadow=True)
+    plt.savefig('static/statistics/sponsor/campaign_status.png')
+
+    # Ad status distribution
+    fig, ax = plt.subplots(figsize=(4, 4))
+    plt.clf()
+    ad_categories = ['Completed', 'Scheduled', 'Active']
+    ad_values = [completed_ads, scheduled_ads, active_ads]
+    plt.pie(ad_values, labels=ad_categories, autopct='%1.1f%%', colors=['pink', 'mistyrose', 'palevioletred'], startangle=140, explode=(0, 0, 0.05), shadow=True)
+    plt.savefig('static/statistics/sponsor/ad_status.png')
+
+    # Monthly expenditure
+    monthly_expenditure = (db.session.query(
+                            db.func.strftime("%Y-%m", Campaign.start_date).label("month"),
+                            db.func.sum(Campaign.budget).label("total_budget"))
+                           .filter(Campaign.sponsor_id == sponsor_id)
+                           .group_by("month")
+                           .order_by("month").all())
+    months, expenditures = zip(*monthly_expenditure)
+    fig, ax = plt.subplots(figsize=(4, 4))
+    plt.clf()
+    plt.plot(months, expenditures, marker='o', linestyle='--', color='palevioletred')
+    plt.xlabel('Month')
+    plt.ylabel('Expenditure')
+    plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
+    plt.savefig('static/statistics/sponsor/monthly_expenditure.png')
+
+    return render_template('sponsor_statistics.html', sponsor_id=sponsor_id, first_name=sponsor.first_name, last_name=sponsor.last_name)
     
 
 @app.route('/campaign_details/<int:sponsor_id>/<int:camp_id>', methods=['GET', 'POST'])
