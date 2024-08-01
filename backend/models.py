@@ -13,7 +13,6 @@ class Sponsor(db.Model):
     budget = db.Column(db.Float, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
     type = db.Column(db.Enum('company', 'individual'), nullable=False)
-    # add functionality for inputting the name and details of company if associated with a company
     flagged = db.Column(db.Boolean, default=False)
     campaign = db.relationship('Campaign', backref='sponsor', cascade='all, delete-orphan')
 
@@ -27,7 +26,6 @@ class Influencer(db.Model):
     password = db.Column(db.String, nullable=False)
     email = db.Column(db.String, unique=True, nullable=False)
     earning = db.Column(db.Integer, default=0)
-    profile_pic = db.Column(db.String)      # remove this attribute
     flagged = db.Column(db.Boolean, default=False)
     reach = db.relationship('Reach', backref='influencer', cascade='all, delete-orphan')
     ad_request = db.relationship('Ad_Request', backref='influencer')
@@ -80,7 +78,7 @@ class Ad_Request(db.Model):
     influencer_id = db.Column(db.Integer, db.ForeignKey('influencer.id'))
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'), nullable=False)
     title = db.Column(db.String, nullable=False)
-    status = db.Column(db.Enum('pending', 'accepted', 'rejected', 'requested'))      # replace the rejected status with completed
+    status = db.Column(db.Enum('pending', 'accepted', 'completed', 'requested'))
     # when a sposnor gives an ad to influencer it will be 'pending' while if an influencer requests a sponsor for an 
     # ad then the status of that ad would be 'requested' othereise it is None 
     payment_amount = db.Column(db.Float, nullable=False)
