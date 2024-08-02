@@ -76,7 +76,48 @@ class CampaignAPI(Resource):
             return 'Campaign deleted.', 200
         else:
             return 'Campaign not found!', 400
+        
+class InfluencerAPI(Resource):
+    def get(self, influencer_id):
+        influencer = Influencer.query.get(influencer_id)
+        if influencer:
+            influencer_details = {
+                'id': influencer.id,
+                'first_name': influencer.first_name,
+                'last_name': influencer.last_name,
+                'age': influencer.age,
+                'username': influencer.username,
+                'password': influencer.password,
+                'email': influencer.email,
+                'earning': influencer.earning,
+                'flagged': influencer.flagged
+            }
+            return influencer_details
+        else:
+            return 'Influencer not found!', 404
+        
+class SponsorAPI(Resource):
+    def get(self, sponsor_id):
+        sponsor = Sponsor.query.get(sponsor_id)
+        if sponsor:
+            sponsor_details = {
+                'id': sponsor.id,
+                'first_name': sponsor.first_name,
+                'last_name': sponsor.last_name,
+                'usernmae': sponsor.username,
+                'password': sponsor.password,
+                'industry': sponsor.industry,
+                'budget': sponsor.budget,
+                'email': sponsor.email,
+                'type': sponsor.type,
+                'flagged': sponsor.flagged
+            }
+            return sponsor_details
+        else:
+            return 'Sponsor not found!', 404
 
 api.add_resource(CampaignAPI, '/api/campaign/<int:sponsor_id>',
                  '/api/campaign/update/<int:camp_id>', 
                  '/api/campaign/delete/<int:camp_id>')
+api.add_resource(InfluencerAPI, '/api/influencer/<int:influencer_id>')
+api.add_resource(SponsorAPI, '/api/sponsor/<int:sponsor_id>')
