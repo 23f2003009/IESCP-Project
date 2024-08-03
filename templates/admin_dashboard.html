@@ -19,7 +19,6 @@
                             <a class="nav-link active" aria-current="page" href="/admin_dashboard">Information</a>
                             <a class="nav-link" href="/admin_find">Find</a>
                             <a class="nav-link" href="admin_statistics">Statistics</a>
-                            <a class="nav-link" href="#">Logout</a>
                         </div>
                     </div>
                 </div>
@@ -61,7 +60,7 @@
             <h5 class="text-center"><br>Flagged Campaigns</h5>
             
             {% if flagged_campaigns %}
-                {% for key,value in flagged_campaigns %}
+                {% for key,value in flagged_campaigns.items() %}
                     <div class="col-sm-4">
                         <div class="card">
                             <div class="card-body">
@@ -87,7 +86,7 @@
             <h5 class="text-center"><br>Flagged Influencers</h5>
 
             {% if flagged_influencers %}
-                {% for key, value in flagged_influencers %}
+                {% for key, value in flagged_influencers.items() %}
                     <div class="col-sm-4">
                         <div class="card">
                             <div class="card-body">
