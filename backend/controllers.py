@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from flask import current_app as app
 from .models import *
 from datetime import datetime
@@ -72,8 +72,7 @@ def flag_sponsor(sponsor_id):
     sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
     sponsor.flagged = True
     db.session.commit()
-    return render_template('admin_dashboard.html', active_campaigns=fetch_active_campaigns(), flagged_campaigns=fetch_flagged_campaigns(), 
-                           flagged_influencers=fetch_flagged_influencers(), flagged_sponsors=fetch_flagged_sponsors())
+    return redirect(url_for('admin_dashboard'))
 
 
 @app.route('/unflag_sponsor/<int:sponsor_id>', methods=['GET', 'POST'])
@@ -81,8 +80,7 @@ def unflag_sponsor(sponsor_id):
     sponsor = Sponsor.query.filter_by(id=sponsor_id).first()
     sponsor.flagged = False
     db.session.commit()
-    return render_template('admin_dashboard.html', active_campaigns=fetch_active_campaigns(), flagged_campaigns=fetch_flagged_campaigns(), 
-                           flagged_influencers=fetch_flagged_influencers(), flagged_sponsors=fetch_flagged_sponsors())
+    return redirect(url_for('admin_dashboard'))
 
 
 @app.route('/flag_influencer/<int:influencer_id>', methods=['GET', 'POST'])
@@ -90,8 +88,7 @@ def flag_influencer(influencer_id):
     influencer = Influencer.query.filter_by(id=influencer_id).first()
     influencer.flagged = True
     db.session.commit()
-    return render_template('admin_dashboard.html', active_campaigns=fetch_active_campaigns(), flagged_campaigns=fetch_flagged_campaigns(), 
-                           flagged_influencers=fetch_flagged_influencers(), flagged_sponsors=fetch_flagged_sponsors())
+    return redirect(url_for('admin_dashboard'))
 
 
 @app.route('/unflag_influencer/<int:influencer_id>', methods=['GET', 'POST'])
@@ -99,8 +96,7 @@ def unflag_influencer(influencer_id):
     influencer = Influencer.query.filter_by(id=influencer_id).first()
     influencer.flagged = False
     db.session.commit()
-    return render_template('admin_dashboard.html', active_campaigns=fetch_active_campaigns(), flagged_campaigns=fetch_flagged_campaigns(), 
-                           flagged_influencers=fetch_flagged_influencers(), flagged_sponsors=fetch_flagged_sponsors())
+    return redirect(url_for('admin_dashboard'))
 
 
 @app.route('/flag_campaign/<int:campaign_id>', methods=['GET', 'POST'])
@@ -108,8 +104,7 @@ def flag_campaign(campaign_id):
     campaign = Campaign.query.filter_by(id=campaign_id).first()
     campaign.flagged = True
     db.session.commit()
-    return render_template('admin_dashboard.html', active_campaigns=fetch_active_campaigns(), flagged_campaigns=fetch_flagged_campaigns(), 
-                           flagged_influencers=fetch_flagged_influencers(), flagged_sponsors=fetch_flagged_sponsors())
+    return redirect(url_for('admin_dashboard'))
 
 
 @app.route('/unflag_campaign/<int:campaign_id>', methods=['GET', 'POST'])
@@ -117,8 +112,7 @@ def unflag_campaign(campaign_id):
     campaign = Campaign.query.filter_by(id=campaign_id).first()
     campaign.flagged = False
     db.session.commit()
-    return render_template('admin_dashboard.html', active_campaigns=fetch_active_campaigns(), flagged_campaigns=fetch_flagged_campaigns(), 
-                           flagged_influencers=fetch_flagged_influencers(), flagged_sponsors=fetch_flagged_sponsors())
+    return redirect(url_for('admin_dashboard'))
 
 
 @app.route('/admin_find', methods=['GET', 'POST'])
